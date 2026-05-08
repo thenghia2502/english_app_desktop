@@ -1,0 +1,7 @@
+{
+    "css.lint.unknownAtRules": "ignore",
+    "editor.formatOnSave": true,
+    "[css]": {
+        "editor.formatOnSave": true
+    }
+}
