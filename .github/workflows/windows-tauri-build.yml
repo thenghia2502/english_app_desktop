@@ -34,7 +34,7 @@ jobs:
         run: npm ci
 
       - name: Build Tauri app (includes frontend build via beforeBuildCommand)
-        run: npm run tauri build
+        run: npx tauri build
 
       - name: Upload installer bundles
         uses: actions/upload-artifact@v4
