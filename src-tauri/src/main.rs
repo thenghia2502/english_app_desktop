@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use reqwest::blocking::Client;
+use scraper::{ Html, Selector };
 use rusqlite::{ params, Connection, OptionalExtension };
 use serde::{ Deserialize, Serialize };
 use std::collections::{ HashMap, HashSet };
@@ -162,6 +163,8 @@ struct SeedData {
     curriculum_units: Vec<SeedCurriculumUnit>,
     levels_code: Vec<SeedLevelCode>,
     levels: Vec<SeedLevel>,
+    #[serde(default)]
+    notes: Vec<SeedNote>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -269,6 +272,15 @@ struct SeedLessonWord {
     word_show_word: i64,
     word_show_ipa_and_word: i64,
     word_progress: i64,
+}
+
+#[derive(Debug, Deserialize)]
+struct SeedNote {
+    id: String,
+    unit_id: String,
+    content: String,
+    created_at: String,
+    updated_at: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -451,6 +463,7 @@ CREATE TABLE IF NOT EXISTS lessons_words (
 
 CREATE TABLE IF NOT EXISTS notes (
   id TEXT PRIMARY KEY,
+  unit_id TEXT NOT NULL DEFAULT '',
   content TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -619,6 +632,16 @@ CREATE TABLE IF NOT EXISTS notes (
         )
         .map_err(|e| format!("failed to backfill words ipa fields: {e}"))?;
 
+    // Ensure notes table has unit_id column for linking notes to units
+    // Only try if the notes table already exists (created via seed)
+    if table_has_column(conn, "notes", "id")? {
+        if !table_has_column(conn, "notes", "unit_id")? {
+            conn
+                .execute("ALTER TABLE notes ADD COLUMN unit_id TEXT NOT NULL DEFAULT ''", [])
+                .map_err(|e| format!("failed to migrate notes.unit_id: {e}"))?;
+        }
+    }
+
     Ok(())
 }
 
@@ -643,6 +666,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
     let expected_words_units = seed.words_units.len();
     let expected_lessons_units = seed.lessons_units.len();
     let expected_lessons_words = seed.lessons_words.len();
+    let expected_notes = seed.notes.len();
 
     let seed_curriculum_ids: HashSet<String> = seed.curriculums
         .iter()
@@ -1072,6 +1096,21 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
             .map_err(|e| format!("seed lessons_words error: {e}"))?;
     }
 
+    for item in seed.notes {
+        tx
+            .execute(
+                "INSERT INTO notes (id, unit_id, content, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5)
+                 ON CONFLICT(id) DO UPDATE SET
+                    unit_id = excluded.unit_id,
+                    content = excluded.content,
+                    created_at = excluded.created_at,
+                    updated_at = excluded.updated_at",
+                params![item.id, item.unit_id, item.content, item.created_at, item.updated_at]
+            )
+            .map_err(|e| format!("seed notes error: {e}"))?;
+    }
+
     tx.commit().map_err(|e| format!("seed commit error: {e}"))?;
 
     let actual_curriculums: i64 = conn
@@ -1107,6 +1146,9 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
     let actual_lessons_words: i64 = conn
         .query_row("SELECT COUNT(*) FROM lessons_words", [], |row| row.get(0))
         .map_err(|e| format!("failed to verify lessons_words count: {e}"))?;
+    let actual_notes: i64 = conn
+        .query_row("SELECT COUNT(*) FROM notes", [], |row| row.get(0))
+        .map_err(|e| format!("failed to verify notes count: {e}"))?;
 
     let mismatches = [
         ("curriculums", actual_curriculums, expected_curriculums as i64),
@@ -1120,6 +1162,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
         ("words_units", actual_words_units, expected_words_units as i64),
         ("lessons_units", actual_lessons_units, expected_lessons_units as i64),
         ("lessons_words", actual_lessons_words, expected_lessons_words as i64),
+        ("notes", actual_notes, expected_notes as i64),
     ]
         .into_iter()
         .filter(|(_, actual, expected)| actual != expected)
@@ -1188,7 +1231,7 @@ fn get_curriculums(
     let mut param_values: Vec<rusqlite::types::Value> = Vec::new();
 
     if let Some(search_pattern) = search_pattern {
-        query.push_str(" WHERE name LIKE ? OR description LIKE ?");
+        query.push_str(" WHERE type = 'sb' AND (name LIKE ? OR description LIKE ?)");
         param_values.push(rusqlite::types::Value::Text(search_pattern.clone()));
         param_values.push(rusqlite::types::Value::Text(search_pattern));
     }
@@ -1486,12 +1529,20 @@ fn add_words_to_unit(
 }
 
 #[tauri::command]
-fn check_word_to_unit(
-    state: State<AppState>,
-    unit_id: String,
-    word_id: String
-) -> Result<bool, String> {
+fn check_word_to_unit(state: State<AppState>, payload: serde_json::Value) -> Result<bool, String> {
     let mut conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    // Support both snake_case and camelCase keys from frontend
+    let unit_id = payload
+        .get("unit_id")
+        .or_else(|| payload.get("unitId"))
+        .and_then(|v| v.as_str())
+        .ok_or("missing unit id")?;
+    let word_id = payload
+        .get("word_id")
+        .or_else(|| payload.get("wordId"))
+        .and_then(|v| v.as_str())
+        .ok_or("missing word id")?;
 
     let exists: bool = conn
         .query_row(
@@ -2191,6 +2242,17 @@ pub struct StudentBookDetail {
 }
 
 #[derive(serde::Serialize)]
+pub struct WorkBookDetail {
+    pub id: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub student_book_id: Option<String>,
+    pub units: Vec<UnitBasic>,
+}
+
+#[derive(serde::Serialize)]
 pub struct UnitBasic {
     pub id: String,
     pub title: String,
@@ -2208,7 +2270,7 @@ fn get_student_book_by_id(state: State<AppState>, id: String) -> Result<StudentB
         .query_row(
             "
         SELECT id, name, description, created_at, updated_at, work_book_id
-        FROM curriculum_original
+        FROM curriculums
         WHERE id = ?1
         ",
             params![id],
@@ -2262,6 +2324,83 @@ fn get_student_book_by_id(state: State<AppState>, id: String) -> Result<StudentB
         created_at: book.3,
         updated_at: book.4,
         work_book_id: book.5,
+        units,
+    })
+}
+
+#[tauri::command]
+fn get_work_book_by_id(state: State<AppState>, id: String) -> Result<WorkBookDetail, String> {
+    println!("🔍 get_work_book_by_id called with id: {:?}", id);
+
+    let conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    // --------------------------------------------------
+    // 1. GET curriculum
+    // --------------------------------------------------
+    let book = conn
+        .query_row(
+            "
+        SELECT id, name, description, created_at, updated_at, student_book_id
+        FROM curriculums
+        WHERE id = ?1
+        ",
+            params![id],
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, Option<String>>(2)?,
+                    row.get::<_, Option<String>>(3)?,
+                    row.get::<_, Option<String>>(4)?,
+                    row.get::<_, Option<String>>(5)?,
+                ))
+            }
+        )
+        .map_err(|e| {
+            let error_msg = format!("query error for id '{}': {}", id, e);
+            println!("❌ {}", error_msg);
+            error_msg
+        })?;
+
+    println!("✅ Found curriculum: {}", book.1);
+
+    // --------------------------------------------------
+    // 2. GET units
+    // --------------------------------------------------
+    let mut stmt = conn
+        .prepare(
+            "
+        SELECT u.id, u.title, u.link
+        FROM curriculum_units cu
+        JOIN units u ON u.id = cu.unit_id
+        WHERE cu.curriculum_id = ?1
+        ORDER BY u.\"order\"
+        "
+        )
+        .map_err(|e| format!("prepare units error: {e}"))?;
+
+    let units = stmt
+        .query_map(params![id], |row| {
+            Ok(UnitBasic {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                link: row.get(2).ok(),
+            })
+        })
+        .map_err(|e| format!("query units error: {e}"))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("map units error: {e}"))?;
+
+    // --------------------------------------------------
+    // 3. BUILD RESULT
+    // --------------------------------------------------
+    Ok(WorkBookDetail {
+        id: book.0,
+        name: book.1,
+        description: book.2,
+        created_at: book.3,
+        updated_at: book.4,
+        student_book_id: book.5,
         units,
     })
 }
@@ -2650,8 +2789,17 @@ pub struct Note {
 }
 
 #[tauri::command]
-fn get_note_by_id(state: State<AppState>, note_id: String) -> Result<Option<Note>, String> {
+fn get_note_by_id(
+    state: State<AppState>,
+    payload: serde_json::Value
+) -> Result<Option<Note>, String> {
     let conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    let unit_id = payload
+        .get("unit_id")
+        .or_else(|| payload.get("unitId"))
+        .and_then(|v| v.as_str())
+        .ok_or("missing unit id")?;
 
     let mut stmt = conn
         .prepare(
@@ -2663,14 +2811,14 @@ fn get_note_by_id(state: State<AppState>, note_id: String) -> Result<Option<Note
                 created_at,
                 updated_at
             FROM notes
-            WHERE id = ?1
+            WHERE unit_id = ?1
             LIMIT 1
             "
         )
         .map_err(|e| format!("prepare error: {e}"))?;
 
     let result = stmt
-        .query_row([note_id], |row| {
+        .query_row([unit_id], |row| {
             Ok(Note {
                 id: row.get(0)?,
                 unit_id: row.get(1)?,
@@ -2720,28 +2868,28 @@ fn upsert_unit_note(
 
     let now = chrono::Utc::now().to_rfc3339();
 
-    // 🚀 UPSERT
+    // Replace the existing note for the unit, if any.
+    conn
+        .execute("DELETE FROM notes WHERE unit_id = ?1", rusqlite::params![payload.unit_id])
+        .map_err(|e| format!("delete before upsert error: {e}"))?;
+
     conn
         .execute(
             "
-        INSERT INTO unit_notes (id, unit_id, content, created_at, updated_at)
-        VALUES (lower(hex(randomblob(16))), ?1, ?2, ?3, ?4, ?4)
-        ON CONFLICT(unit_id)
-        DO UPDATE SET
-            content = excluded.content,
-            updated_at = excluded.updated_at
+        INSERT INTO notes (id, unit_id, content, created_at, updated_at)
+        VALUES (lower(hex(randomblob(16))), ?1, ?2, ?3, ?3)
         ",
             rusqlite::params![payload.unit_id, payload.content, now]
         )
-        .map_err(|e| format!("upsert error: {e}"))?;
+        .map_err(|e| format!("insert error: {e}"))?;
 
     // 🔥 SELECT lại giống `.select().single()`
     let mut stmt = conn
         .prepare(
             "
         SELECT id, unit_id, content, created_at, updated_at
-        FROM unit_notes
-        WHERE unit_id = ?2
+        FROM notes
+        WHERE unit_id = ?1
         LIMIT 1
         "
         )
@@ -2841,6 +2989,368 @@ fn resolve_audio(
     }
     println!("Audio for word '{}' saved to '{}'", word, file_path.display());
     Ok(Some(file_path.to_string_lossy().into_owned()))
+}
+
+// Fetch Cambridge page HTML and parse IPA/audio data for a word.
+fn fetch_cambridge_ipa_and_audio(
+    word: &str
+) -> Result<(Option<String>, Option<String>, Option<String>, Option<String>), String> {
+    let url = format!(
+        "https://dictionary.cambridge.org/dictionary/english/{}",
+        urlencoding::encode(word)
+    );
+    let client = Client::new();
+    let resp = client
+        .get(&url)
+        .header("User-Agent", "Mozilla/5.0")
+        .send()
+        .map_err(|e| format!("request error: {e}"))?;
+    if !resp.status().is_success() {
+        return Err(format!("cambridge returned status {}", resp.status()));
+    }
+
+    let html = resp.text().map_err(|e| format!("read body error: {e}"))?;
+    let document = Html::parse_document(&html);
+
+    let sel_uk_ipa = Selector::parse("span.uk .ipa").ok();
+    let sel_us_ipa = Selector::parse("span.us .ipa").ok();
+    let sel_ipa = Selector::parse("span.ipa").ok();
+    let sel_uk_source = Selector::parse("span.uk source[type=\"audio/mpeg\"]").ok();
+    let sel_us_source = Selector::parse("span.us source[type=\"audio/mpeg\"]").ok();
+
+    let uk_ipa = sel_uk_ipa
+        .and_then(|s|
+            document
+                .select(&s)
+                .next()
+                .map(|e| e.text().collect::<String>().trim().to_string())
+        )
+        .filter(|s| !s.is_empty());
+
+    let us_ipa = sel_us_ipa
+        .and_then(|s|
+            document
+                .select(&s)
+                .next()
+                .map(|e| e.text().collect::<String>().trim().to_string())
+        )
+        .filter(|s| !s.is_empty());
+
+    let uk_src = sel_uk_source.and_then(|s|
+        document
+            .select(&s)
+            .next()
+            .and_then(|e| e.value().attr("src"))
+            .map(|s| s.to_string())
+    );
+
+    let us_src = sel_us_source.and_then(|s|
+        document
+            .select(&s)
+            .next()
+            .and_then(|e| e.value().attr("src"))
+            .map(|s| s.to_string())
+    );
+
+    // fallback: find any .ipa
+    let uk_ipa = match uk_ipa {
+        Some(v) => Some(v),
+        None =>
+            sel_ipa
+                .and_then(|s|
+                    document
+                        .select(&s)
+                        .next()
+                        .map(|e| e.text().collect::<String>().trim().to_string())
+                )
+                .filter(|s| !s.is_empty()),
+    };
+
+    // Prepend host to src if present
+    let uk_url = uk_src.map(|s| (
+        if s.starts_with("http") {
+            s
+        } else {
+            format!("https://dictionary.cambridge.org{}", s)
+        }
+    ));
+    let us_url = us_src.map(|s| (
+        if s.starts_with("http") {
+            s
+        } else {
+            format!("https://dictionary.cambridge.org{}", s)
+        }
+    ));
+
+    Ok((uk_ipa, us_ipa, uk_url, us_url))
+}
+
+#[derive(Serialize)]
+struct IpaResponse {
+    id: Option<String>,
+    meaning: Option<String>,
+    uk_ipa: Option<String>,
+    us_ipa: Option<String>,
+    word: Option<String>,
+}
+
+#[tauri::command]
+fn get_ipa(state: State<AppState>, word: String) -> Result<Option<IpaResponse>, String> {
+    let conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, meaning, uk_ipa, us_ipa, word FROM words WHERE LOWER(word) = LOWER(?1) LIMIT 1"
+        )
+        .map_err(|e| format!("prepare error: {e}"))?;
+
+    let result = stmt
+        .query_row(params![&word], |row| {
+            Ok(IpaResponse {
+                id: row.get::<_, Option<String>>(0)?,
+                meaning: row.get::<_, Option<String>>(1)?,
+                uk_ipa: row.get::<_, Option<String>>(2)?,
+                us_ipa: row.get::<_, Option<String>>(3)?,
+                word: row.get::<_, Option<String>>(4)?,
+            })
+        })
+        .optional()
+        .map_err(|e| format!("query error: {e}"))?;
+
+    if result.is_some() {
+        return Ok(result);
+    }
+
+    let (uk_ipa, us_ipa, uk_url, us_url) = match fetch_cambridge_ipa_and_audio(&word) {
+        Ok(data) => data,
+        Err(_) => {
+            return Ok(None);
+        }
+    };
+
+    if uk_ipa.is_none() && us_ipa.is_none() && uk_url.is_none() && us_url.is_none() {
+        return Ok(None);
+    }
+
+    let now = chrono::Utc::now().to_rfc3339();
+    let id = next_id("word");
+    let ipa_combined = uk_ipa.clone().or(us_ipa.clone()).unwrap_or_default();
+    let uk_value = uk_ipa.clone().unwrap_or_default();
+    let us_value = us_ipa.clone().unwrap_or_default();
+
+    conn
+        .execute(
+            "INSERT INTO words (id, word, meaning, ipa, uk_ipa, us_ipa, ipa_uk, ipa_us, popularity, parent_id, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, NULL, ?9, ?9)",
+            rusqlite::params![
+                id.clone(),
+                word.clone(),
+                String::new(),
+                ipa_combined,
+                uk_value.clone(),
+                us_value.clone(),
+                uk_value,
+                us_value,
+                now
+            ]
+        )
+        .map_err(|e| format!("failed to insert word: {e}"))?;
+
+    let normalized = normalize_word_to_filename(&word);
+    let client = Client::new();
+
+    if let Some(url) = uk_url {
+        let accent_dir = state.audio_root.join("uk");
+        fs::create_dir_all(&accent_dir).map_err(|e| format!("failed to create uk audio dir: {e}"))?;
+        let file_path = accent_dir.join(format!("{normalized}.mp3"));
+        if !file_path.exists() {
+            if let Ok(resp) = client.get(&url).header("User-Agent", "Mozilla/5.0").send() {
+                if resp.status().is_success() {
+                    if let Ok(bytes) = resp.bytes() {
+                        let _ = fs::write(&file_path, &bytes);
+                    }
+                }
+            }
+        }
+    }
+
+    if let Some(url) = us_url {
+        let accent_dir = state.audio_root.join("us");
+        fs::create_dir_all(&accent_dir).map_err(|e| format!("failed to create us audio dir: {e}"))?;
+        let file_path = accent_dir.join(format!("{normalized}.mp3"));
+        if !file_path.exists() {
+            if let Ok(resp) = client.get(&url).header("User-Agent", "Mozilla/5.0").send() {
+                if resp.status().is_success() {
+                    if let Ok(bytes) = resp.bytes() {
+                        let _ = fs::write(&file_path, &bytes);
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(
+        Some(IpaResponse {
+            id: Some(id),
+            meaning: None,
+            uk_ipa,
+            us_ipa,
+            word: Some(word),
+        })
+    )
+}
+
+#[tauri::command]
+fn get_ipa_from_file(
+    state: State<AppState>,
+    file_path: String
+) -> Result<Vec<IpaResponse>, String> {
+    let conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    // Read file content
+    let file_content = fs
+        ::read_to_string(&file_path)
+        .map_err(|e| format!("failed to read file '{}': {e}", file_path))?;
+
+    // Parse JSON to extract words (expect array of strings or objects with 'word' field)
+    let words: Vec<String> = if let Ok(arr) = serde_json::from_str::<Vec<String>>(&file_content) {
+        arr
+    } else if let Ok(arr) = serde_json::from_str::<Vec<serde_json::Value>>(&file_content) {
+        arr.iter()
+            .filter_map(|v| {
+                if let Some(s) = v.as_str() {
+                    Some(s.to_string())
+                } else if let Some(obj) = v.as_object() {
+                    obj.get("word")
+                        .or_else(|| obj.get("text"))
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    } else {
+        return Err(
+            "file is not valid JSON (expected array of strings or objects with 'word'/'text' field)".into()
+        );
+    };
+
+    let mut results = Vec::new();
+
+    for word in words {
+        if word.trim().is_empty() {
+            continue;
+        }
+
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, meaning, uk_ipa, us_ipa, word FROM words WHERE LOWER(word) = LOWER(?1) LIMIT 1"
+            )
+            .map_err(|e| format!("prepare error: {e}"))?;
+
+        match
+            stmt.query_row(params![word], |row| {
+                Ok(IpaResponse {
+                    id: row.get::<_, Option<String>>(0)?,
+                    meaning: row.get::<_, Option<String>>(1)?,
+                    uk_ipa: row.get::<_, Option<String>>(2)?,
+                    us_ipa: row.get::<_, Option<String>>(3)?,
+                    word: row.get::<_, Option<String>>(4)?,
+                })
+            })
+        {
+            Ok(ipa_data) => results.push(ipa_data),
+            Err(_) => {
+                // Word not found, skip or add empty entry
+                results.push(IpaResponse {
+                    id: None,
+                    meaning: None,
+                    uk_ipa: None,
+                    us_ipa: None,
+                    word: None,
+                });
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tauri::command]
+fn get_ipa_from_content(
+    state: State<AppState>,
+    content: String
+) -> Result<Vec<IpaResponse>, String> {
+    let conn = open_connection(&state.db_path).map_err(|e| format!("open db error: {e}"))?;
+
+    // Parse JSON content to extract words (array of strings or objects with 'word'/'text')
+    let words: Vec<String> = if let Ok(arr) = serde_json::from_str::<Vec<String>>(&content) {
+        arr
+    } else if let Ok(arr) = serde_json::from_str::<Vec<serde_json::Value>>(&content) {
+        arr.iter()
+            .filter_map(|v| {
+                if let Some(s) = v.as_str() {
+                    Some(s.to_string())
+                } else if let Some(obj) = v.as_object() {
+                    obj.get("word")
+                        .or_else(|| obj.get("text"))
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    } else {
+        return Err(
+            "content is not valid JSON (expected array of strings or objects with 'word'/'text' field)".into()
+        );
+    };
+
+    let mut results = Vec::new();
+
+    for word in words {
+        if word.trim().is_empty() {
+            results.push(IpaResponse {
+                id: None,
+                meaning: None,
+                uk_ipa: None,
+                us_ipa: None,
+                word: None,
+            });
+            continue;
+        }
+
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, meaning, uk_ipa, us_ipa, word FROM words WHERE LOWER(word) = LOWER(?1) LIMIT 1"
+            )
+            .map_err(|e| format!("prepare error: {e}"))?;
+
+        match
+            stmt.query_row(params![word], |row| {
+                Ok(IpaResponse {
+                    id: row.get::<_, Option<String>>(0)?,
+                    meaning: row.get::<_, Option<String>>(1)?,
+                    uk_ipa: row.get::<_, Option<String>>(2)?,
+                    us_ipa: row.get::<_, Option<String>>(3)?,
+                    word: row.get::<_, Option<String>>(4)?,
+                })
+            })
+        {
+            Ok(ipa_data) => results.push(ipa_data),
+            Err(_) =>
+                results.push(IpaResponse {
+                    id: None,
+                    meaning: None,
+                    uk_ipa: None,
+                    us_ipa: None,
+                    word: None,
+                }),
+        }
+    }
+
+    Ok(results)
 }
 
 fn ensure_runtime_layout(base_app_data: &Path) -> Result<(PathBuf, PathBuf), String> {
@@ -2972,7 +3482,10 @@ fn main() {
                 get_note_by_id,
                 upsert_unit_note,
                 delete_note,
-                resolve_audio
+                resolve_audio,
+                get_ipa,
+                get_ipa_from_file,
+                get_work_book_by_id
             ]
         )
         .run(tauri::generate_context!())

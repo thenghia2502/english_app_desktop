@@ -224,7 +224,7 @@ export default function App() {
 
         {/* Các route khác giữ nguyên */}
         <Route
-          path="/books"
+          path="/"
           element={<BooksPage onOpenBook={(bookId) => navigate(`/book/${bookId}`)} />}
         />
 
@@ -232,7 +232,7 @@ export default function App() {
           path="/book/:bookId"
           element={
             <BookReaderRoute
-              onBack={() => navigate("/books")}
+              onBack={() => navigate("/")}
               onOpenWorkbook={(workbookId) => navigate(`/workbook/${workbookId}`)}
             />
           }
@@ -269,7 +269,7 @@ function BookReaderRoute({
 }) {
   const { bookId = "" } = useParams();
   if (!bookId) {
-    return <Navigate to="/books" replace />;
+    return <Navigate to="/" replace />;
   }
   return <BookReaderPage bookId={bookId} onBack={onBack} onOpenWorkbook={onOpenWorkbook} />;
 }
@@ -283,7 +283,7 @@ function WorkbookRoute({
 }) {
   const { workbookId = "" } = useParams();
   if (!workbookId) {
-    return <Navigate to="/books" replace />;
+    return <Navigate to="/" replace />;
   }
   return <WorkbookPage workbookId={workbookId} onBack={onBack} onOpenStudentBook={onOpenStudentBook} />;
 }

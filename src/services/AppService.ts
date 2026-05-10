@@ -122,6 +122,18 @@ class AppService {
     return appRepository.getStudentBookById(id);
   }
 
+  getWorkBookById(id: string): Promise<{
+    id: string;
+    name: string;
+    description?: string;
+    created_at?: string;
+    updated_at?: string;
+    student_book_id?: string;
+    units: Array<{ id: string; title: string; link?: string }>;
+  }> {
+    return appRepository.getWorkBookById(id);
+  }
+
   updateLessonWordsBulk(
     lessonId: string,
     name: string,
@@ -140,8 +152,8 @@ class AppService {
     return appRepository.getLessonList(search, limit, page, sortBy, sortOrder);
   }
 
-  getNoteById(idNote: string): Promise<NoteItem | null> {
-    return appRepository.getNoteById(idNote);
+  getNoteById(unit_id: string): Promise<NoteItem | null> {
+    return appRepository.getNoteById(unit_id);
   }
 
   upsertNote(payload: UpsertNotePayload): Promise<NoteItem | null> {
@@ -152,21 +164,33 @@ class AppService {
     return appRepository.resolveAudio(word, accent);
   }
 
+  async getIpaForWord(word: string): Promise<any> {
+    return appRepository.getIpa(word);
+  }
+
+  async getIpaFromFile(filePath: string): Promise<Array<{ id?: string; meaning?: string; ukIPA?: string; usIPA?: string; ipa?: string }>> {
+    return appRepository.getIpaFromFile(filePath);
+  }
+
+  async getIpaFromContent(content: string): Promise<Array<{ id?: string; meaning?: string; ukIPA?: string; usIPA?: string; ipa?: string }>> {
+    return appRepository.getIpaFromContent(content);
+  }
+
   deleteNoteById(idNote: string): Promise<unknown> {
     return appRepository.deleteNoteById(idNote);
   }
 
-  getStudentBookByCurriculumId(curriculumId: string): Promise<{
-    id: string;
-    name: string;
-    description?: string;
-    created_at?: string;
-    updated_at?: string;
-    work_book_id?: string;
-    units: Array<{ id: string; title: string; link?: string }>;
-  } | null> {
-    return appRepository.getStudentBookByCurriculumId(curriculumId);
-  }
+  // getStudentBookByCurriculumId(curriculumId: string): Promise<{
+  //   id: string;
+  //   name: string;
+  //   description?: string;
+  //   created_at?: string;
+  //   updated_at?: string;
+  //   work_book_id?: string;
+  //   units: Array<{ id: string; title: string; link?: string }>;
+  // } | null> {
+  //   return appRepository.getStudentBookByCurriculumId(curriculumId);
+  // }
 }
 
 export const appService = new AppService();

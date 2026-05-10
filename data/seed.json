@@ -1,6 +1,17 @@
 {
   "curriculums": [
     {
+      "id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "name": "American Family and Friends 3 WB 2nd Edition",
+      "description": null,
+      "created_at": "2026-03-30 02:25:17.81959",
+      "updated_at": "2026-03-30 02:25:17.81959",
+      "student_book_id": "7e2e7dd6-6553-4b6b-a56d-f7ff46f518ed",
+      "type": "wb",
+      "work_book_id": null,
+      "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/Screenshot%202025-11-28%20101724.png"
+    },
+    {
       "id": "7a2467a2-79d0-4547-8ae2-eb0a71f8c633",
       "name": "American Family and Friends 4 SB 2nd Edition",
       "description": null,
@@ -35,6 +46,18 @@
     }
   ],
   "curriculum_units": [
+    {
+      "curriculum_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "unit_id": "01cc90d4-1da9-4215-9832-a16aa7a3fd0c"
+    },
+    {
+      "curriculum_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "unit_id": "2e9fe824-7c3d-4a67-8283-e67262032d6d"
+    },
+    {
+      "curriculum_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "unit_id": "41c666ba-e998-43af-ba57-2b4941e6cec9"
+    },
     {
       "curriculum_id": "7a2467a2-79d0-4547-8ae2-eb0a71f8c633",
       "unit_id": "0629008c-ed78-47b8-9852-91ba5100cb8a"
@@ -73,6 +96,19 @@
     }
   ],
   "books": [
+    {
+      "id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "title": "American Family and Friends 3 WB 2nd Edition",
+      "description": null,
+      "curriculum_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "created_at": "2026-03-30 02:25:17.81959",
+      "updated_at": "2026-03-30 02:25:17.81959",
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
+      "student_book_id": "7e2e7dd6-6553-4b6b-a56d-f7ff46f518ed",
+      "type": "wb",
+      "work_book_id": null,
+      "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/Screenshot%202025-11-28%20101724.png"
+    },
     {
       "id": "7a2467a2-79d0-4547-8ae2-eb0a71f8c633",
       "title": "American Family and Friends 4 SB 2nd Edition",
@@ -114,6 +150,36 @@
     }
   ],
   "units": [
+    {
+      "id": "41c666ba-e998-43af-ba57-2b4941e6cec9",
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
+      "title": "10. In the park!",
+      "order": 10,
+      "created_at": "2026-03-31 06:47:05.48836",
+      "updated_at": "2026-03-31 06:47:05.48836",
+      "link": "https://drive.google.com/file/d/1gs_cdzY2GodkmxjKaKSvlMkwtCKRxOmD/view?usp=drive_link",
+      "book_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2"
+    },
+    {
+      "id": "2e9fe824-7c3d-4a67-8283-e67262032d6d",
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
+      "title": "13. The Ancient Mayans",
+      "order": 13,
+      "created_at": "2026-03-31 06:47:05.48836",
+      "updated_at": "2026-03-31 06:47:05.48836",
+      "link": "https://drive.google.com/file/d/1Doeh0CojXmY5Gxl5vqmmN5pmnx8GRNDN/view?usp=drive_link",
+      "book_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2"
+    },
+    {
+      "id": "01cc90d4-1da9-4215-9832-a16aa7a3fd0c",
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
+      "title": "4. We're having fun at the beach!",
+      "order": 4,
+      "created_at": "2026-03-31 06:47:05.48836",
+      "updated_at": "2026-03-31 06:47:05.48836",
+      "link": "https://drive.google.com/file/d/1D4N9Br864cR-kzGVzhOZ_gNfXGr9ueXS/view?usp=drive_link",
+      "book_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2"
+    },
     {
       "id": "0629008c-ed78-47b8-9852-91ba5100cb8a",
       "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
@@ -835,5 +901,20 @@
       "code": "C2"
     }
   ],
-  "notes": []
+  "notes": [
+    {
+      "id": "7a2467a2aa-79d0bb-4547cc-8ae2-eb0a71f8c633",
+      "unit_id": "0629008c-ed78-47b8-9852-91ba5100cb8a",
+      "content": "test",
+      "created_at": "2026-04-06 02:58:04.18085",
+      "updated_at": "2026-04-06 02:58:04.18085"
+    },
+    {
+      "id": "7a2467a2aa-79d0bb-4547cc-8ae2-eb0a71f8c633hnvgki",
+      "unit_id": "41c666ba-e998-43af-ba57-2b4941e6cec9",
+      "content": "test",
+      "created_at": "2026-04-06 02:58:04.18085",
+      "updated_at": "2026-04-06 02:58:04.18085"
+    }
+  ]
 }

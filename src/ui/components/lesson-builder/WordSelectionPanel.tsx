@@ -271,7 +271,7 @@ export default function WordSelectionPanel({
                             <span className="text-black text-sm cursor-pointer italic hover:underline" onClick={() => handleOpenModalAddWords(unit.unit_id, unit.unit_name)}>thêm từ</span>
                         </div>
                         <Card className="bg-white shadow-sm border border-gray-200">
-                            <CardContent className="p-0 pt-2">
+                            <CardContent className="p-0 pt-6">
                                 <Table>
                                     <TableBody>
                                         {rootsOriginal.map((root) => {

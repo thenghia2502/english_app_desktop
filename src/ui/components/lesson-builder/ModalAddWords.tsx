@@ -6,6 +6,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useGetUrlAudio } from "@/hooks/use-audios"
+import { appService } from "../../../services/AppService"
 import { useAddWordToUnit } from "@/hooks/use-add-word-to-unit"
 import { useCheckWordInUnit } from "@/hooks/use-check-word-in-unit"
 import { useToast } from "@/hooks/use-toast"
@@ -46,12 +47,23 @@ export default function ModalAddWords({ unitId, unitTitle, onClose, onAdded }: {
     const fetchIpaAndCheckExistence = async (value: string, idx: number) => {
         if (!value.trim()) return;
 
-        const res = await fetch(`/api/proxy/words/get_ipa?words=${encodeURIComponent(value)}`);
-        const data = await res.json();
+        let data: any = null
+        try {
+            data = await appService.getIpaForWord(value)
+        } catch (err) {
+            console.error("getIpaForWord error:", err)
+            return
+        }
 
         console.log("API data:", data);
-        const existsData = data?.id
-            ? await checkWordInUnit({ wordId: data.id, unitId })
+        // Normalize response keys (some APIs return different field names)
+        const mappedId = data?.id || data?.word_id || data?.wordId || data?.id_word || "";
+        const mappedMeaning = data?.meaning || data?.definition || data?.def || data?.description || "";
+        const mappedUk = data?.ukIPA || data?.uk_ipa || data?.ukIpa || data?.ipa_uk || data?.uk || "";
+        const mappedUs = data?.usIPA || data?.us_ipa || data?.usIpa || data?.ipa_us || data?.us || "";
+
+        const existsData = mappedId
+            ? await checkWordInUnit({ wordId: mappedId, unitId })
             : null
         const existsFlag = typeof existsData === "boolean" ? existsData : !!existsData?.exists
         console.log("Existence data:", existsData);
@@ -59,12 +71,13 @@ export default function ModalAddWords({ unitId, unitTitle, onClose, onAdded }: {
             const updated = [...prev];
             updated[idx] = {
                 ...updated[idx],
-                id: data.id || "",
-                meaning: data.meaning || "",
-                ukIpa: data.ukIPA || "",
-                usIpa: data.usIPA || "",
+                id: mappedId || updated[idx].id,
+                meaning: mappedMeaning || updated[idx].meaning,
+                ukIpa: mappedUk || updated[idx].ukIpa,
+                usIpa: mappedUs || updated[idx].usIpa,
                 exist: existsFlag
             };
+            rowsByUnitRef.current[unitId] = updated;
             console.log("Updated row:", updated[idx]);
             return updated;
         });
@@ -213,64 +226,62 @@ export default function ModalAddWords({ unitId, unitTitle, onClose, onAdded }: {
 
         setIsUploading(true)
         try {
-            const formData = new FormData()
-            formData.append('file', file)
+            const text = await file.text()
 
-            const response = await fetch('/api/proxy/file/upload', {
-                method: 'POST',
-                body: formData
-            })
-
-            if (!response.ok) {
-                throw new Error(`Upload failed: ${response.statusText}`)
-            }
-
-            const data = await response.json()
-            console.log("Imported data:", data)
-
-            // API trả về format mới: { success, rows: { validRows: [...], invalidRows: [...] } }
-            const validRowsRaw = Array.isArray(data?.rows) ? data.rows : []
-
-            const combinedRows = [...validRowsRaw]
-            console.log("combinedRows: ", combinedRows)
-            if (combinedRows.length > 0) {
-                const newRows = combinedRows.map((word: any) => ({
-                    id: word.id || "",
-                    text: word.text || "",
-                    meaning: word.meaning || "",
-                    ukIpa: word.ukIPA || "",
-                    usIpa: word.usIPA || "",
-                    errors: word.errors || {},
-                    exist: false
-                }))
-
-                // Kiểm tra sự tồn tại cho các từ import
-                for (let i = 0; i < newRows.length; i++) {
-                    if (newRows[i].id) {
-                        const existsData = await checkWordInUnit({
-                            wordId: newRows[i].id,
-                            unitId
-                        })
-                        newRows[i].exist = typeof existsData === "boolean" ? existsData : !!existsData?.exists
-                    }
+            // Try to parse JSON array of words, otherwise split by newlines
+            let parsedWords: string[] = []
+            try {
+                const parsed = JSON.parse(text)
+                if (Array.isArray(parsed)) {
+                    parsedWords = parsed.map(p => typeof p === 'string' ? p : (p.text || p.word || ''))
+                } else if (parsed?.words && Array.isArray(parsed.words)) {
+                    parsedWords = parsed.words.map((p: any) => typeof p === 'string' ? p : (p.text || p.word || ''))
+                } else {
+                    parsedWords = [String(parsed)]
                 }
-
-                // Merge với rows hiện tại (loại bỏ row trống và tránh duplicate)
-                setRows(prev => {
-                    const filtered = prev.filter(r => r.text.trim() || r.meaning.trim())
-
-                    // Lọc ra các từ import chưa tồn tại trong unit và chưa có trong rows hiện tại
-                    const existingTexts = new Set(filtered.map(r => r.text.trim().toLowerCase()))
-                    const uniqueNewRows = newRows.filter(r =>
-                        !existingTexts.has(r.text.trim().toLowerCase())
-                    )
-
-                    const combined = filtered.length > 0 ? [...filtered, ...uniqueNewRows] : uniqueNewRows
-                    const merged = [...combined, { id: "", text: "", meaning: "", ukIpa: "", usIpa: "", exist: false }]
-                    rowsByUnitRef.current[unitId] = merged
-                    return merged
-                })
+            } catch (e) {
+                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+                parsedWords = lines
             }
+
+            // Call backend Tauri command to resolve IPA for content
+            // send a JSON array of words as the command expects JSON
+            const ipaResults = await appService.getIpaFromContent(JSON.stringify(parsedWords))
+            console.log("Imported IPA results:", ipaResults)
+
+            const newRows = ipaResults.map((item: any, idx: number) => ({
+                id: item?.id || "",
+                text: item?.word || parsedWords[idx] || "",
+                meaning: item?.meaning || "",
+                ukIpa: item?.ukIPA || item?.uk_ipa || item?.ipa || "",
+                usIpa: item?.usIPA || item?.us_ipa || item?.ipa || "",
+                errors: {},
+                exist: false
+            }))
+
+            // Kiểm tra sự tồn tại cho các từ import
+            for (let i = 0; i < newRows.length; i++) {
+                if (newRows[i].id) {
+                    const existsData = await checkWordInUnit({
+                        wordId: newRows[i].id,
+                        unitId
+                    })
+                    newRows[i].exist = typeof existsData === "boolean" ? existsData : !!existsData?.exists
+                }
+            }
+
+            // Merge với rows hiện tại (loại bỏ row trống và tránh duplicate)
+            setRows(prev => {
+                const filtered = prev.filter(r => r.text.trim() || r.meaning.trim())
+
+                const existingTexts = new Set(filtered.map(r => r.text.trim().toLowerCase()))
+                const uniqueNewRows = newRows.filter(r => !existingTexts.has(r.text.trim().toLowerCase()))
+
+                const combined = filtered.length > 0 ? [...filtered, ...uniqueNewRows] : uniqueNewRows
+                const merged = [...combined, { id: "", text: "", meaning: "", ukIpa: "", usIpa: "", exist: false }]
+                rowsByUnitRef.current[unitId] = merged
+                return merged
+            })
         } catch (error) {
             console.error("Error importing file:", error)
             toast({
@@ -279,19 +290,14 @@ export default function ModalAddWords({ unitId, unitTitle, onClose, onAdded }: {
             });
         } finally {
             setIsUploading(false)
-            // Reset input để có thể import lại cùng file
             if (fileInputRef.current) {
                 fileInputRef.current.value = ''
             }
         }
     }
-    const fetchIpa = async (word: string, dialect: "uk" | "us") => {
-        const res = await fetch(`/api/proxy/words/ipa/${dialect}?word=${encodeURIComponent(word)}`);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch ${dialect.toUpperCase()} IPA: ${res.statusText}`);
-        }
-        return await res.json();
-    }
+    // const fetchIpa = async (word: string, dialect: "uk" | "us") => {
+    //     return appService.getIpaDialect(word, dialect)
+    // }
 
     return (
         <div className="modal fixed inset-0 flex items-center justify-center z-90">
@@ -329,7 +335,7 @@ export default function ModalAddWords({ unitId, unitTitle, onClose, onAdded }: {
                                                     placeholder="e.g. notebook"
                                                     value={row.text}
                                                     onChange={(e) => handleChange(idx, "text", e.target.value)}
-                                                    // onBlur={() => fetchIpaAndCheckExistence(rows[idx].text, idx)}
+                                                    onBlur={() => fetchIpaAndCheckExistence(rows[idx].text, idx)}
                                                     className={`${row.exist && 'border-red-500'}`}
                                                     onKeyDown={e => {
                                                         if (e.key === "Enter") {

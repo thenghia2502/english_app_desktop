@@ -29,11 +29,11 @@ export class AppRepository {
   }
 
   addWordsToUnit(unitId: string, wordIds: string[]): Promise<boolean> {
-    return invoke("add_words_to_unit", { unitId, wordIds });
+    return invoke("add_words_to_unit", { unit_id: unitId, word_ids: wordIds });
   }
 
   checkWordToUnit(unitId: string, wordId: string): Promise<boolean> {
-    return invoke("check_word_to_unit", { unitId, wordId });
+    return invoke("check_word_to_unit", { payload: { unit_id: unitId, word_id: wordId } });
   }
 
   createLessonWithUnits(
@@ -143,6 +143,20 @@ export class AppRepository {
     return invoke("get_student_book_by_id", { id });
   }
 
+  getWorkBookById(
+    id: string
+  ): Promise<{
+    id: string;
+    name: string;
+    description?: string;
+    created_at?: string;
+    updated_at?: string;
+    student_book_id?: string;
+    units: Array<{ id: string; title: string; link?: string }>;
+  }> {
+    return invoke("get_work_book_by_id", { id });
+  }
+
   updateLessonWordsBulk(
     lessonId: string,
     name: string,
@@ -171,28 +185,40 @@ export class AppRepository {
     return invoke("get_lesson_list", { search, limit, page, sortBy, sortOrder });
   }
 
-  getNoteById(idNote: string): Promise<NoteItem | null> {
-    return invoke("get_note_by_id", { noteId: idNote });
+  getNoteById(unit_id: string): Promise<NoteItem | null> {
+    return invoke("get_note_by_id", { payload: { unit_id } });
   }
 
   upsertNote(payload: UpsertNotePayload): Promise<NoteItem | null> {
-    return invoke("upsert_unit_note", { unitId: payload.unitId, content: payload.content });
+    return invoke("upsert_unit_note", { payload: { unit_id: payload.unitId, content: payload.content } });
   }
 
   deleteNoteById(idNote: string): Promise<unknown> {
-    return invoke("delete_note", { noteId: idNote });
+    return invoke("delete_note", { note_id: idNote });
   }
 
-  getStudentBookByCurriculumId(curriculumId: string): Promise<{
-    id: string;
-    name: string;
-    description?: string;
-    created_at?: string;
-    updated_at?: string;
-    work_book_id?: string;
-    units: Array<{ id: string; title: string; link?: string }>;
-  } | null> {
-    return invoke("get_student_book_by_curriculum_id", { curriculumId });
+  // getStudentBookByCurriculumId(curriculumId: string): Promise<{
+  //   id: string;
+  //   name: string;
+  //   description?: string;
+  //   created_at?: string;
+  //   updated_at?: string;
+  //   work_book_id?: string;
+  //   units: Array<{ id: string; title: string; link?: string }>;
+  // } | null> {
+  //   return invoke("get_student_book_by_curriculum_id", { curriculumId });
+  // }
+
+  getIpa(word: string): Promise<{ id?: string; meaning?: string; uk_ipa?: string; us_ipa?: string; word?: string }> {
+    return invoke("get_ipa", { word });
+  }
+
+  getIpaFromFile(filePath: string): Promise<Array<{ id?: string; meaning?: string; ukIPA?: string; usIPA?: string; ipa?: string }>> {
+    return invoke("get_ipa_from_file", { file_path: filePath });
+  }
+
+  getIpaFromContent(content: string): Promise<Array<{ id?: string; meaning?: string; ukIPA?: string; usIPA?: string; ipa?: string }>> {
+    return invoke("get_ipa_from_content", { content });
   }
 }
 

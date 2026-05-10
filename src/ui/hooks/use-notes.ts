@@ -35,10 +35,10 @@ const parseJsonSafe = async <T>(response: Response): Promise<T | null> => {
     }
 }
 
-const fetchNoteById = async (idNote: string): Promise<NoteItem | null> => {
+const fetchNoteById = async (unit_id: string): Promise<NoteItem | null> => {
     try {
 
-        const data = await appService.getNoteById(idNote)
+        const data = await appService.getNoteById(unit_id)
 
         return data
     } catch (err) {
@@ -75,13 +75,13 @@ export const noteKeys = {
     detail: (idNote: string) => [...noteKeys.details(), idNote] as const,
 }
 
-export const useNote = (idNote?: string | null) => {
-    const queryKey = idNote ? noteKeys.detail(idNote) : noteKeys.details()
+export const useNote = (unit_id?: string | null) => {
+    const queryKey = unit_id ? noteKeys.detail(unit_id) : noteKeys.details()
 
     return useQuery({
         queryKey,
-        queryFn: () => (idNote ? fetchNoteById(idNote) : Promise.resolve(null)),
-        enabled: !!idNote,
+        queryFn: () => (unit_id ? fetchNoteById(unit_id) : Promise.resolve(null)),
+        enabled: !!unit_id,
     })
 }
 

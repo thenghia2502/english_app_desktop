@@ -213,7 +213,7 @@ export interface WorkbookResponse {
     [key: string]: unknown
 }
 
-// const getWorkbook = async (curriculumId: string): Promise<Curriculum> => {
+// const getWorkbookById = async (curriculumId: string): Promise<Curriculum> => {
 //     const data = await appService.getStudentBookByCurriculumId(curriculumId)
 
 //     return data
@@ -316,7 +316,7 @@ export const useWorkBookById = (id: string) => {
     return useQuery<Curriculum | null, Error>({
         queryKey: [...curriculumKeys.details(), 'work-book', id],
         queryFn: async () => {
-            const data = await appService.getStudentBookById(id)
+            const data = await appService.getWorkBookById(id)
             return data as unknown as Curriculum | null
         },
         enabled: !!id,
@@ -327,7 +327,7 @@ export const useWorkBookById = (id: string) => {
 export const useGetWorkbook = (curriculumId: string) => {
     return useQuery<WorkbookResponse | null, Error>({
         queryKey: [...curriculumKeys.detail(curriculumId), 'workbook'],
-        queryFn: () => appService.getStudentBookByCurriculumId(curriculumId) as Promise<WorkbookResponse | null>,
+        queryFn: () => appService.getWorkBookById(curriculumId) as Promise<WorkbookResponse | null>,
         enabled: !!curriculumId,
     })
 }

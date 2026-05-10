@@ -6,6 +6,7 @@ import { BookUnit } from "../../types";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { PDFViewer } from "../../[id]/PDFViewer";
 import { Card, CardContent } from "@/components/ui/card";
+import SpeechToText from "@/book/speechToText";
 // Mock data - in production this would come from a database
 
 interface BookReaderProps {
@@ -61,7 +62,7 @@ export default function ControlExercises({ book, onBack, onOpenStudentBook }: Bo
     <div className="flex h-screen flex-col bg-white text-gray-900">
       {/* Header */}
       <header className="border-b bg-background px-6 py-4">
-        <div className="flex items-center gap-3 justify-between">
+        <div className="flex items-center gap-3">
           <Button variant="outline" onClick={onBack}>Back</Button>
           <div className="flex items-center gap-3">
             <BookOpen className="h-6 w-6 text-primary" />
@@ -89,7 +90,7 @@ export default function ControlExercises({ book, onBack, onOpenStudentBook }: Bo
 
         {/* Left Panel - Units List */}
         {isLeftPanelOpen && (
-          <aside className="w-64 flex-shrink-0 border-r bg-muted/30 ">
+          <aside className="w-64 shrink-0 border-r bg-muted/30 ">
             {/* Close Button */}
             <ScrollArea className="h-full">
               <div className="pt-0">
@@ -133,7 +134,7 @@ export default function ControlExercises({ book, onBack, onOpenStudentBook }: Bo
         {/* {!isLeftPanelOpen && <div className="w-16" />} */}
 
         {/* Middle Panel - PDF Viewer - Fixed width */}
-        <main className="flex-1 flex-shrink-0 bg-muted/10">
+        <main className="flex-1 shrink-0 bg-muted/10">
           <div className="h-full p-4">
             <Card className="h-full">
               <CardContent className="h-[calc(100%)] p-0">
@@ -157,7 +158,7 @@ export default function ControlExercises({ book, onBack, onOpenStudentBook }: Bo
 
         {/* Right Panel - Speech to Text */}
         {isRightPanelOpen && (
-          <aside className="flex-1 max-w-1/3 flex-shrink-0 border-l bg-background flex flex-col">
+          <aside className="flex-1 max-w-1/3 shrink-0 border-l bg-background flex flex-col">
             <div className="pl-4 border-b flex items-center justify-end">
               <Button
                 variant="default"
@@ -170,30 +171,14 @@ export default function ControlExercises({ book, onBack, onOpenStudentBook }: Bo
             </div>
             {/* Note Input */}
             <div className="border-b w-full flex-1 flex flex-col">
-              <div className="p-4 flex flex-col gap-3 h-full">
-                <input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Exercise note title"
-                  className="w-full rounded-md border border-slate-300 px-3 py-2"
-                />
-                <textarea
-                  value={spokenText}
-                  onChange={(event) => setSpokenText(event.target.value)}
-                  placeholder="Write your exercise notes here..."
-                  className="w-full flex-1 resize-none rounded-md border border-slate-300 p-3"
-                />
-                <Button
-                  onClick={async () => {
-                    if (saveNotesRef.current) {
-                      await saveNotesRef.current();
-                    }
-                  }}
-                  disabled={!spokenText.trim()}
-                >
-                  Save Notes
-                </Button>
-              </div>
+              <SpeechToText
+                title={title}
+                setTitle={setTitle}
+                onTextChange={setSpokenText}
+                bookId={book.id}
+                unitId={selectedUnit.id}
+                saveNotesRef={saveNotesRef}
+              />
             </div>
           </aside>
         )}

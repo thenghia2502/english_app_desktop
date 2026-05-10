@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { BookOpen, Save, ChevronLeft, ChevronRight } from "lucide-react"
 import type { BookNote } from "../types"
 import { useNote, useUpsertNote } from "@/hooks/use-notes"
-import { useGetWorkbook } from "@/hooks/use-curriculum"
+import { useGetWorkbook, useStudentBookById } from "@/hooks/use-curriculum"
 import { PDFViewer } from "./PDFViewer"
 import { NotesEditor } from "./NotesEditor"
 
@@ -27,7 +27,7 @@ interface BookReaderProps {
 
 export function BookReader({ book, onBack, onOpenWorkbook }: BookReaderProps) {
   const upsertNoteMutation = useUpsertNote()
-  const workbookQuery = useGetWorkbook(book?.id)
+  // const workbookQuery = useStudentBookById(book?.id)
   const [selectedUnit, setSelectedUnit] = useState<{ id: string, title: string, link: string } | null>(book?.units?.[0] ?? null)
   const noteQuery = useNote(selectedUnit?.id)
   const [notes, setNotes] = useState<Record<string, string>>({})
@@ -118,9 +118,9 @@ export function BookReader({ book, onBack, onOpenWorkbook }: BookReaderProps) {
   }
 
   const handleGetWorkbook = () => {
-    const workbook = workbookQuery.data
+    // const workbook = workbookQuery.data
 
-    const rawRef = workbook?.workbookId || workbook?.workbook_id || workbook?.id_wb || workbook?.workbookUrl || workbook?.url || workbook?.id || book.work_book_id
+    const rawRef = book.work_book_id
 
     if (!rawRef) {
       console.error('Workbook id/url is not available')
@@ -145,7 +145,7 @@ export function BookReader({ book, onBack, onOpenWorkbook }: BookReaderProps) {
     <div className="flex h-screen flex-col bg-white text-gray-900">
       {/* Header */}
       <header className="border-b bg-background px-6 py-4">
-        <div className="flex items-center gap-3 justify-between">
+        <div className="flex items-center gap-3">
           <Button variant="outline" onClick={onBack}>Back</Button>
           <div className="flex items-center gap-3">
             <BookOpen className="h-6 w-6 text-primary" />
@@ -213,7 +213,8 @@ export function BookReader({ book, onBack, onOpenWorkbook }: BookReaderProps) {
                     onClick={handleGetWorkbook}
                   // disabled={workbookQuery.isLoading}
                   >
-                    {workbookQuery.isLoading ? 'Đang tải sách bài tập...' : 'Xem sách bài tập'}
+                    {/* {workbookQuery.isLoading ? 'Đang tải sách bài tập...' : 'Xem sách bài tập'} */}
+                    {'Xem sách bài tập'}
                   </Button>
                 </div>
               </div>
