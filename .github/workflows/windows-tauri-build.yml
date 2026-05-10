@@ -1,0 +1,53 @@
+name: Build Windows Tauri
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust (MSVC)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Tauri app (includes frontend build via beforeBuildCommand)
+        run: npm run tauri build
+
+      - name: Upload installer bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-bundles
+          path: |
+            src-tauri/target/release/bundle/**
+          if-no-files-found: warn
+
+      - name: Upload release executable fallback
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-exe
+          path: |
+            src-tauri/target/release/*.exe
+          if-no-files-found: warn
