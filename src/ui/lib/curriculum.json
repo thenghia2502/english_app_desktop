@@ -1,0 +1,541 @@
+[
+    {
+        "id": "curriculum-1",
+        "title": "English for Everyone",
+        "description": "A beginner's guide to English language concepts and skills.",
+        "createdAt": "2023-10-01T12:00:00Z",
+        "levels": [
+            {
+                "id": "level-1",
+                "name": "Beginner",
+                "description": "Introduction to basic English vocabulary and grammar.",
+                "units": [
+                    {
+                        "id": "unit-1",
+                        "name": "Introducing yourself",
+                        "content": "Dùng “to be” để giới thiệu tên, đánh vần tên"
+                    },
+                    {
+                        "id": "unit-2",
+                        "name": "Countries",
+                        "content": "Tên quốc gia, số đếm, tính từ chỉ quốc tịch"
+                    },
+                    {
+                        "id": "unit-3",
+                        "name": "Talking about yourself",
+                        "content": "To be với tuổi và quốc tịch"
+                    },
+                    {
+                        "id": "unit-4",
+                        "name": "Family and pets",
+                        "content": "Từ vựng về gia đình và thú cưng"
+                    },
+                    {
+                        "id": "unit-5",
+                        "name": "Daily routines",
+                        "content": "Thời gian, hoạt động hàng ngày"
+                    },
+                    {
+                        "id": "unit-6",
+                        "name": "Food and drink",
+                        "content": "Từ vựng về thực phẩm và đồ uống"
+                    },
+                    {
+                        "id": "unit-7",
+                        "name": "Travel",
+                        "content": "Câu hỏi và câu trả lời về du lịch"
+                    },
+                    {
+                        "id": "unit-8",
+                        "name": "Shopping",
+                        "content": "Từ vựng về mua sắm và giá cả"
+                    },
+                    {
+                        "id": "unit-9",
+                        "name": "Hobbies and interests",
+                        "content": "Từ vựng về sở thích và hoạt động giải trí"
+                    },
+                    {
+                        "id": "unit-10",
+                        "name": "Weather",
+                        "content": "Mô tả thời tiết và các hoạt động liên quan"
+                    },
+                    {
+                        "id": "unit-11",
+                        "name": "Health and fitness",
+                        "content": "Từ vựng về sức khỏe và thể dục"
+                    },
+                    {
+                        "id": "unit-12",
+                        "name": "Review",
+                        "content": "Ôn tập các kiến thức đã học"
+                    },
+                    {
+                        "id": "unit-13",
+                        "name": "Final assessment",
+                        "content": "Kiểm tra cuối khóa"
+                    },
+                    {
+                        "id": "unit-14",
+                        "name": "Feedback and next steps",
+                        "content": "Nhận xét và hướng dẫn tiếp theo"
+                    },
+                    {
+                        "id": "unit-15",
+                        "name": "Cultural insights",
+                        "content": "Khám phá văn hóa các nước nói tiếng Anh"
+                    },
+                    {
+                        "id": "unit-16",
+                        "name": "Future learning",
+                        "content": "Hướng dẫn học tập tiếp theo"
+                    },
+                    {
+                        "id": "unit-17",
+                        "name": "Resources and tools",
+                        "content": "Công cụ và tài nguyên học tập"
+                    },
+                    {
+                        "id": "unit-18",
+                        "name": "Community and support",
+                        "content": "Kết nối với cộng đồng học viên"
+                    },
+                    {
+                        "id": "unit-19",
+                        "name": "Celebrating progress",
+                        "content": "Chúc mừng những tiến bộ đã đạt được"
+                    },
+                    {
+                        "id": "unit-20",
+                        "name": "Conclusion",
+                        "content": "Tổng kết khóa học và lời chào tạm biệt"
+                    },
+                    {
+                        "id": "unit-21",
+                        "name": "Additional resources",
+                        "content": "Tài nguyên bổ sung cho việc học"
+                    },
+                    {
+                        "id": "unit-22",
+                        "name": "Next steps in learning",
+                        "content": "Các bước tiếp theo trong việc học tiếng Anh"
+                    },
+                    {
+                        "id": "unit-23",
+                        "name": "Final thoughts",
+                        "content": "Những suy nghĩ cuối cùng về khóa học"
+                    },
+                    {
+                        "id": "unit-24",
+                        "name": "Thank you and goodbye",
+                        "content": "Lời cảm ơn và tạm biệt"
+                    },
+                    {
+                        "id": "unit-25",
+                        "name": "Feedback survey",
+                        "content": "Khảo sát phản hồi về khóa học"
+                    },
+                    {
+                        "id": "unit-26",
+                        "name": "Certificate of completion",
+                        "content": "Cấp chứng chỉ hoàn thành khóa học"
+                    },
+                    {
+                        "id": "unit-27",
+                        "name": "Future learning opportunities",
+                        "content": "Cơ hội học tập trong tương lai"
+                    },
+                    {
+                        "id": "unit-28",
+                        "name": "Networking and connections",
+                        "content": "Kết nối và mở rộng mạng lưới"
+                    },
+                    {
+                        "id": "unit-29",
+                        "name": "Lifelong learning",
+                        "content": "Khuyến khích học tập suốt đời"
+                    },
+                    {
+                        "id": "unit-30",
+                        "name": "Resources for continued learning",
+                        "content": "Tài nguyên cho việc học tiếp tục"
+                    },
+                    {
+                        "id": "unit-31",
+                        "name": "Staying motivated",
+                        "content": "Cách duy trì động lực học tập"
+                    },
+                    {
+                        "id": "unit-32",
+                        "name": "Engaging with the community",
+                        "content": "Tham gia cộng đồng học viên"
+                    },
+                    {
+                        "id": "unit-33",
+                        "name": "Sharing your journey",
+                        "content": "Chia sẻ hành trình học tập của bạn"
+                    },
+                    {
+                        "id": "unit-34",
+                        "name": "Celebrating achievements",
+                        "content": "Ăn mừng những thành tựu đã đạt được"
+                    },
+                    {
+                        "id": "unit-35",
+                        "name": "Looking ahead",
+                        "content": "Nhìn về tương lai và các mục tiêu mới"
+                    },
+                    {
+                        "id": "unit-36",
+                        "name": "Final reflections",
+                        "content": "Những suy nghĩ cuối cùng về khóa học"
+                    },
+                    {
+                        "id": "unit-37",
+                        "name": "Thank you for participating",
+                        "content": "Cảm ơn bạn đã tham gia khóa học"
+                    },
+                    {
+                        "id": "unit-38",
+                        "name": "Goodbye and best wishes",
+                        "content": "Lời chào tạm biệt và chúc bạn thành công"
+                    },
+                    {
+                        "id": "unit-39",
+                        "name": "Additional learning resources",
+                        "content": "Tài nguyên học tập bổ sung"
+                    },
+                    {
+                        "id": "unit-40",
+                        "name": "Continuing your English journey",
+                        "content": "Tiếp tục hành trình học tiếng Anh của bạn"
+                    }
+                ]
+            },
+            {
+                "id": "level-2",
+                "name": "Intermediate",
+                "description": "Building on basic skills with more complex structures.",
+                "units": [
+                    {
+                        "id": "unit-1",
+                        "name": "Daily Activities",
+                        "content": "Describing daily routines and activities."
+                    },
+                    {
+                        "id": "unit-2",
+                        "name": "Food and Drink",
+                        "content": "Vocabulary related to food and drink."
+                    },
+                    {
+                        "id": "unit-3",
+                        "name": "Travel",
+                        "content": "Common phrases and vocabulary for travel."
+                    },
+                    {
+                        "id": "unit-4",
+                        "name": "Shopping",
+                        "content": "Useful phrases for shopping and bargaining."
+                    },
+                    {
+                        "id": "unit-5",
+                        "name": "Health and Fitness",
+                        "content": "Discussing health issues and fitness activities."
+                    },
+                    {
+                        "id": "unit-6",
+                        "name": "Hobbies and Interests",
+                        "content": "Talking about personal interests and hobbies."
+                    },
+                    {
+                        "id": "unit-7",
+                        "name": "Weather",
+                        "content": "Describing weather conditions and seasons."
+                    },
+                    {
+                        "id": "unit-8",
+                        "name": "Socializing",
+                        "content": "Phrases for making friends and socializing."
+                    },
+                    {
+                        "id": "unit-9",
+                        "name": "Work and Employment",
+                        "content": "Vocabulary related to jobs and workplaces."
+                    },
+                    {
+                        "id": "unit-10",
+                        "name": "Education",
+                        "content": "Discussing school subjects and education systems."
+                    },
+                    {
+                        "id": "unit-11",
+                        "name": "Entertainment",
+                        "content": "Talking about movies, music, and books."
+                    },
+                    {
+                        "id": "unit-12",
+                        "name": "Review and Practice",
+                        "content": "Revisiting key concepts and practicing skills."
+                    },
+                    {
+                        "id": "unit-13",
+                        "name": "Final Assessment",
+                        "content": "Evaluating progress and understanding."
+                    },
+                    {
+                        "id": "unit-14",
+                        "name": "Feedback and Next Steps",
+                        "content": "Providing feedback and suggesting further learning."
+                    },
+                    {
+                        "id": "unit-15",
+                        "name": "Cultural Insights",
+                        "content": "Exploring cultural aspects of English-speaking countries."
+                    },
+                    {
+                        "id": "unit-16",
+                        "name": "Future Learning",
+                        "content": "Guidance on continuing English language studies."
+                    },
+                    {
+                        "id": "unit-17",
+                        "name": "Resources and Tools",
+                        "content": "Useful resources for further learning."
+                    },
+                    {
+                        "id": "unit-18",
+                        "name": "Community and Support",
+                        "content": "Connecting with other learners for support."
+                    },
+                    {
+                        "id": "unit-19",
+                        "name": "Celebrating Progress",
+                        "content": "Acknowledging achievements and progress made."
+                    },
+                    {
+                        "id": "unit-20",
+                        "name": "Conclusion",
+                        "content": "Summarizing the course and providing final thoughts."
+                    },
+                    {
+                        "id": "unit-21",
+                        "name": "Additional Resources",
+                        "content": "Offering extra materials for continued learning."
+                    },
+                    {
+                        "id": "unit-22",
+                        "name": "Next Steps in Learning",
+                        "content": "Encouraging further study and practice."
+                    },
+                    {
+                        "id": "unit-23",
+                        "name": "Final Thoughts",
+                        "content": "Reflecting on the learning journey."
+                    },
+                    {
+                        "id": "unit-24",
+                        "name": "Thank You and Goodbye",
+                        "content": "Expressing gratitude and saying farewell."
+                    },
+                    {
+                        "id": "unit-25",
+                        "name": "Feedback Survey",
+                        "content": "Collecting feedback on the course experience."
+                    },
+                    {
+                        "id": "unit-26",
+                        "name": "Certificate of Completion",
+                        "content": "Issuing certificates for course completion."
+                    },
+                    {
+                        "id": "unit-27",
+                        "name": "Future Learning Opportunities",
+                        "content": "Exploring further learning options."
+                    },
+                    {
+                        "id": "unit-28",
+                        "name": "Networking and Connections",
+                        "content": "Building connections with other learners."
+                    },
+                    {
+                        "id": "unit-29",
+                        "name": "Lifelong Learning",
+                        "content": "Encouraging a mindset of lifelong learning."
+                    },
+                    {
+                        "id": "unit-30",
+                        "name": "Resources for Continued Learning",
+                        "content": "Providing resources for ongoing education."
+                    },
+                    {
+                        "id": "unit-31",
+                        "name": "Staying Motivated",
+                        "content": "Tips for maintaining motivation in learning."
+                    },
+                    {
+                        "id": "unit-32",
+                        "name": "Engaging with the Community",
+                        "content": "Participating in community activities."
+                    },
+                    {
+                        "id": "unit-33",
+                        "name": "Sharing Your Journey",
+                        "content": "Encouraging learners to share their experiences."
+                    },
+                    {
+                        "id": "unit-34",
+                        "name": "Celebrating Achievements",
+                        "content": "Recognizing personal milestones and successes."
+                    },
+                    {
+                        "id": "unit-35",
+                        "name": "Looking Ahead",
+                        "content": "Setting future goals and aspirations."
+                    },
+                    {
+                        "id": "unit-36",
+                        "name": "Final Reflections",
+                        "content": ""
+                    },
+                    {
+                        "id": "unit-37",
+                        "name": "Thank You for Participating",
+                        "content": "Expressing appreciation for course participation."
+                    },
+                    {
+                        "id": "unit-38",
+                        "name": "Goodbye and Best Wishes",
+                        "content": "Wishing learners success in their future endeavors."
+                    },
+                    {
+                        "id": "unit-39",
+                        "name": "Additional Learning Resources",
+                        "content": "Offering more resources for learners."
+                    },
+                    {
+                        "id": "unit-40",
+                        "name": "Continuing Your English Journey",
+                        "content": "Encouraging ongoing learning and practice."
+                    }
+                ]
+            },
+            {
+                "id": "level-3",
+                "name": "Advanced",
+                "description": "Mastering advanced vocabulary and nuanced grammar.",
+                "units": [
+                    {
+                        "id": "unit-1",
+                        "name": "Business English",
+                        "content": "Vocabulary and phrases for the workplace."
+                    },
+                    {
+                        "id": "unit-2",
+                        "name": "Academic Writing",
+                        "content": "Techniques for writing essays and reports."
+                    },
+                    {
+                        "id": "unit-3",
+                        "name": "Literature",
+                        "content": "Analysis of English literature texts."
+                    },
+                    {
+                        "id": "unit-4",
+                        "name": "Public Speaking",
+                        "content": "Skills for effective presentations and speeches."
+                    },
+                    {
+                        "id": "unit-5",
+                        "name": "Debate and Discussion",
+                        "content": "Engaging in formal discussions and debates."
+                    },
+                    {
+                        "id": "unit-6",
+                        "name": "Cultural Studies",
+                        "content": "Exploring cultural differences and similarities."
+                    },
+                    {
+                        "id": "unit-7",
+                        "name": "Media Literacy",
+                        "content": "Understanding media messages and their impact."
+                    },
+                    {
+                        "id": "unit-8",
+                        "name": "Critical Thinking",
+                        "content": "Developing analytical and critical thinking skills."
+                    },
+                    {
+                        "id": "unit-9",
+                        "name": "Research Skills",
+                        "content": "Conducting research and citing sources."
+                    },
+                    {
+                        "id": "unit-10",
+                        "name": "Review and Practice",
+                        "content": ""
+                    },
+                    {
+                        "id": "unit-11",
+                        "name": "",
+                        "content": ""
+                    },
+                    {
+                        "id": "unit-12",
+                        "name": "Final Assessment",
+                        "content": "Evaluating advanced language skills."
+                    },
+                    {
+                        "id": "unit-13",
+                        "name": "Feedback and Next Steps",
+                        "content": "Providing feedback and suggesting further learning."
+                    },
+                    {
+                        "id": "unit-14",
+                        "name": "Cultural Insights",
+                        "content": "Exploring cultural aspects of English-speaking countries."
+                    },
+                    {
+                        "id": "unit-15",
+                        "name": "Future Learning",
+                        "content": "Guidance on continuing English language studies."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "curriculum-2",
+        "title": "English for Academic Study: Extended Writing & Research Skills",
+        "description": "Advanced English skills for professional settings.",
+        "createdAt": "2023-10-01T12:00:00Z",
+        "levels": [
+            {
+                "id": "level-1",
+                "name": "Professional Communication",
+                "description": "Effective communication in business environments.",
+                "units": [
+                    {
+                        "id": "unit-1",
+                        "name": "Email Etiquette",
+                        "content": "Writing professional emails."
+                    },
+                    {
+                        "id": "unit-2",
+                        "name": "Meetings and Presentations",
+                        "content": "Conducting and participating in meetings."
+                    },
+                    {
+                        "id": "unit-3",
+                        "name": "Negotiation Skills",
+                        "content": ""
+                    },
+                    {
+                        "id": "unit-4",
+                        "name": "",
+                        "content": ""
+                    }
+                ]
+            }
+        ]
+    }
+]

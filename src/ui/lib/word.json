@@ -1,0 +1,20 @@
+{
+    "1": {  "word": "home", "meaning": "nhà", "ipa": "/həʊm/", "popularity": 1},
+    "2": {  "word": "school", "meaning": "trường học", "ipa": "/skuːl/", "popularity": 1},
+    "3": {  "word": "family", "meaning": "gia đình", "ipa": "/ˈfæməli/", "popularity": 1},
+    "4": {  "word": "friend", "meaning": "bạn bè", "ipa": "/frend/", "popularity": 1},
+    "5": {  "word": "water", "meaning": "nước", "ipa": "/ˈwɔːtər/", "popularity": 1},
+    "6": {  "word": "food", "meaning": "thức ăn", "ipa": "/fuːd/", "popularity": 1},
+    "7": {  "word": "chair", "meaning": "ghế", "ipa": "/tʃeə(r)/", "popularity": 1},
+    "8": {  "word": "table", "meaning": "bàn", "ipa": "/ˈteɪbl/", "popularity": 1},
+    "9": { "word": "bed", "meaning": "giường", "ipa": "/bed/", "popularity": 1},
+    "10": { "word": "door", "meaning": "cửa", "ipa": "/dɔː(r)/", "popularity": 1},
+    "11": { "word": "window", "meaning": "cửa sổ", "ipa": "/ˈwɪndəʊ/", "popularity": 1},
+    "12": {  "word": "light", "meaning": "ánh sáng", "ipa": "/laɪt/", "popularity": 1},
+    "13": { "word": "fan", "meaning": "quạt", "ipa": "/fæn/", "popularity": 1},
+    "14": { "word": "pillow", "meaning": "gối", "ipa": "/ˈpɪləʊ/", "popularity": 1},
+    "15": { "word": "blanket", "meaning": "chăn", "ipa": "/ˈblæŋkɪt/", "popularity": 1},
+    "16": {  "word": "shower", "meaning": "vòi sen", "ipa": "/ˈʃaʊə(r)/", "popularity": 1},
+    "17": {  "word": "toilet", "meaning": "nhà vệ sinh", "ipa": "/ˈtɔɪlət/", "popularity": 1},
+    "18": { "word": "kitchen", "meaning": "nhà bếp", "ipa": "/ˈkɪtʃɪn/", "popularity": 1}
+}

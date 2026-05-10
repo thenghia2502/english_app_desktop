@@ -1,0 +1,150 @@
+[
+  {
+    "id": "56ac8013-487b-4257-80e1-f00b44b18ea1",
+    "name": "bai10",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Daily routines",
+      "Countries",
+      "Food and drink",
+      "Talking about yourself"
+    ]
+  },
+  {
+    "id": "e3af4b65-11dc-4de7-933b-0e3c8f617a5c",
+    "name": "test123",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Daily routines",
+      "Hobbies and interests",
+      "Final assessment",
+      "Resources and tools"
+    ]
+  },
+  {
+    "id": "b98398ba-17a9-4203-945b-5100d50548b8",
+    "name": "test1234",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Countries",
+      "Talking about yourself",
+      "Family and pets"
+    ]
+  },
+  {
+    "id": "946dc1f3-b878-478d-95f8-efc62f7ec042",
+    "name": "bai133333",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Countries",
+      "Food and drink"
+    ]
+  },
+  {
+    "id": "9d01df85-a766-4718-a036-fbd02543fd16",
+    "name": "bai26666",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Countries",
+      "Review"
+    ]
+  },
+  {
+    "id": "0d881b29-6b0f-483c-a6b1-2afbee45fdbf",
+    "name": "bai46666",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Food and drink",
+      "Weather",
+      "Feedback and next steps",
+      "Cultural insights"
+    ]
+  },
+  {
+    "id": "0d881b29-6b0f-483c-a6b1-2afbee45dhein",
+    "name": "bai46666111",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Food and drink",
+      "Weather",
+      "Feedback and next steps",
+      "Cultural insights"
+    ]
+  },
+  {
+    "id": "0d881b29-6b0f-483c-a6b1-2afbee45akshci",
+    "name": "bai466662222",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Food and drink",
+      "Weather",
+      "Feedback and next steps",
+      "Cultural insights"
+    ]
+  },
+  {
+    "id": "aedf35c2-ed57-4ea4-91e5-eb4feb6b47a5",
+    "name": "bai2",
+    "id_curriculum": "curriculum-2",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Email Etiquette",
+      "Meetings and Presentations",
+      "Negotiation Skills"
+    ]
+  },
+  {
+    "id": "0cf37567-047d-4f7c-be75-bfe7592f02ac",
+    "name": "testest1",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Daily routines"
+    ]
+  },
+  {
+    "id": "88bbd3c4-82ac-4c56-8fdf-003be40ac023",
+    "name": "test2",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Introducing yourself",
+      "Daily routines"
+    ]
+  },
+  {
+    "id": "7e2b9548-bb85-4c35-8d4a-4192cdffaa40",
+    "name": "gghghg",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-2",
+    "list_exercise": [
+      "Daily Activities",
+      "Health and Fitness",
+      "Food and Drink"
+    ]
+  },
+  {
+    "id": "64f8ad23-0f22-4ff3-ac68-0a6d3c42b115",
+    "name": "ddddd",
+    "id_curriculum": "curriculum-1",
+    "id_level": "level-1",
+    "list_exercise": [
+      "Next steps in learning",
+      "Final thoughts"
+    ]
+  }
+]
