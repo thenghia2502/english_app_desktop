@@ -180,17 +180,81 @@ class AppService {
     return appRepository.deleteNoteById(idNote);
   }
 
-  // getStudentBookByCurriculumId(curriculumId: string): Promise<{
-  //   id: string;
-  //   name: string;
-  //   description?: string;
-  //   created_at?: string;
-  //   updated_at?: string;
-  //   work_book_id?: string;
-  //   units: Array<{ id: string; title: string; link?: string }>;
-  // } | null> {
-  //   return appRepository.getStudentBookByCurriculumId(curriculumId);
-  // }
+  async getStudentBookByCurriculumId(curriculumId: string): Promise<Curriculum | null> {
+    const repo = appRepository as unknown as {
+      getStudentBookByCurriculumId?: (id: string) => Promise<Curriculum | null>;
+    };
+
+    if (repo.getStudentBookByCurriculumId) {
+      return repo.getStudentBookByCurriculumId(curriculumId);
+    }
+
+    return null;
+  }
+
+  async getUnitsByBookId(bookId: string): Promise<Unit[]> {
+    const repo = appRepository as unknown as {
+      getUnitsByBookId?: (id: string) => Promise<Unit[]>;
+    };
+
+    if (repo.getUnitsByBookId) {
+      return repo.getUnitsByBookId(bookId);
+    }
+
+    return [];
+  }
+
+  async getWords(): Promise<Word[]> {
+    const repo = appRepository as unknown as {
+      getWords?: () => Promise<Word[]>;
+    };
+
+    if (repo.getWords) {
+      return repo.getWords();
+    }
+
+    return [];
+  }
+
+  async getWordById(id: string): Promise<Word | null> {
+    const repo = appRepository as unknown as {
+      getWordById?: (wordId: string) => Promise<Word | null>;
+    };
+
+    if (repo.getWordById) {
+      return repo.getWordById(id);
+    }
+
+    return null;
+  }
+
+  async getWordsByLevel(levelId: string): Promise<Word[]> {
+    const repo = appRepository as unknown as {
+      getWordsByLevel?: (id: string) => Promise<Word[]>;
+    };
+
+    if (repo.getWordsByLevel) {
+      return repo.getWordsByLevel(levelId);
+    }
+
+    return [];
+  }
+
+  async createWord(data: Omit<Word, "id">): Promise<Word> {
+    const repo = appRepository as unknown as {
+      createWord?: (payload: Omit<Word, "id">) => Promise<Word>;
+    };
+
+    if (repo.createWord) {
+      return repo.createWord(data);
+    }
+
+    return {
+      ...(data as unknown as Word),
+      id: `${Date.now()}`,
+    };
+  }
+
 }
 
 export const appService = new AppService();
