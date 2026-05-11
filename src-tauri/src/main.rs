@@ -186,7 +186,7 @@ struct SeedCurriculum {
 #[derive(Debug, Deserialize)]
 struct SeedBook {
     id: String,
-    #[serde(rename = "title")]
+    #[serde(alias = "title", alias = "name")]
     name: String,
     #[serde(rename = "type")]
     type_: String,
@@ -202,7 +202,8 @@ struct SeedUnit {
     id: String,
     title: String,
     level_id: String,
-    book_id: String,
+    #[serde(default)]
+    book_id: Option<String>,
     created_at: String,
     updated_at: String,
     order: i32,
@@ -705,6 +706,10 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
         .iter()
         .map(|item| format!("{}|{}", item.lesson_id, item.word_id))
         .collect();
+    let seed_note_ids: HashSet<String> = seed.notes
+        .iter()
+        .map(|item| item.id.clone())
+        .collect();
     let seed_level_ids: HashSet<String> = seed.books
         .iter()
         .map(|item| item.level_id.clone())
@@ -801,6 +806,14 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
         .collect::<Result<HashSet<_>, _>>()
         .map_err(|e| format!("failed to read existing lessons_words: {e}"))?;
 
+    let existing_note_ids: HashSet<String> = conn
+        .prepare("SELECT id FROM notes ORDER BY id")
+        .map_err(|e| format!("failed to inspect existing notes: {e}"))?
+        .query_map([], |row| row.get::<_, String>(0))
+        .map_err(|e| format!("failed to query existing notes: {e}"))?
+        .collect::<Result<HashSet<_>, _>>()
+        .map_err(|e| format!("failed to read existing notes: {e}"))?;
+
     let needs_reseed =
         existing_curriculum_ids != seed_curriculum_ids ||
         existing_level_ids != seed_level_ids ||
@@ -811,7 +824,8 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
         existing_curriculum_unit_pairs != seed_curriculum_unit_pairs ||
         existing_word_unit_pairs != seed_word_unit_pairs ||
         existing_lesson_unit_pairs != seed_lesson_unit_pairs ||
-        existing_lesson_word_pairs != seed_lesson_word_pairs;
+        existing_lesson_word_pairs != seed_lesson_word_pairs ||
+        existing_note_ids != seed_note_ids;
 
     let tx = conn.transaction().map_err(|e| format!("failed to start transaction: {e}"))?;
     println!("needs_reseed: {}", needs_reseed);
@@ -822,6 +836,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
                 DELETE FROM lessons_units;
                 DELETE FROM words_units;
                 DELETE FROM curriculum_units;
+                DELETE FROM notes;
                 DELETE FROM lessons;
                 DELETE FROM words;
                 DELETE FROM units;
@@ -965,7 +980,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
                 params![
                     item.id,
                     item.title,
-                    item.book_id,
+                    item.book_id.unwrap_or_default(),
                     item.level_id,
                     item.order,
                     item.created_at,
