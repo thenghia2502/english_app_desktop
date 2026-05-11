@@ -41,6 +41,7 @@ jobs:
         with:
           name: windows-bundles
           path: |
+            target/release/bundle/**
             src-tauri/target/release/bundle/**
           if-no-files-found: warn
 
@@ -49,5 +50,6 @@ jobs:
         with:
           name: windows-release-exe
           path: |
+            target/release/*.exe
             src-tauri/target/release/*.exe
           if-no-files-found: warn
