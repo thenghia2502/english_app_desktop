@@ -22048,41 +22048,5 @@
       "code": "C2"
     }
   ],
-  "notes": [
-    {
-      "id": "0ddab0f8-b19e-4fab-84ed-7616eb54002f",
-      "unit_id": "dff413f4-3f12-42da-9563-9d3211abc2b1",
-      "content": "test1akhfakhfáda",
-      "created_at": "2026-04-01 01:09:20.217861+00",
-      "updated_at": "2026-04-01 01:45:49.25588+00"
-    },
-    {
-      "id": "74acf76b-1da3-4f43-820f-c5f7d6876b26",
-      "unit_id": "2bbd1e75-1481-4583-bcd8-3068544b3b3c",
-      "content": "kahfahfkalklmll",
-      "created_at": "2026-04-14 08:33:22.317397+00",
-      "updated_at": "2026-04-14 09:31:52.297071+00"
-    },
-    {
-      "id": "b71d9411-d370-4d42-a2a1-de9f779f457a",
-      "unit_id": "06b654c4-5bdd-48a3-b238-9d6523c91ee3",
-      "content": "hábalhfla\n1asfa",
-      "created_at": "2026-03-27 03:15:21.109881+00",
-      "updated_at": "2026-03-27 03:15:21.109881+00"
-    },
-    {
-      "id": "c1cbe85d-69d1-40b2-87cd-d0cfa3846ad9",
-      "unit_id": "f8474885-a871-49c4-9e3b-4ef0382db4c7",
-      "content": "fffffff",
-      "created_at": "2026-03-27 05:16:51.019+00",
-      "updated_at": "2026-03-27 05:16:51.019+00"
-    },
-    {
-      "id": "caf3da72-795d-4e0e-b543-61d88f0e5ae4",
-      "unit_id": "55fcbb3d-8338-43f1-86de-960bbdd46aa7",
-      "content": "àhlkahakjsàafafafâfafafwfeefsaf",
-      "created_at": "2026-04-01 01:42:38.930994+00",
-      "updated_at": "2026-04-14 09:44:11.880872+00"
-    }
-  ]
+  "notes": []
 }
