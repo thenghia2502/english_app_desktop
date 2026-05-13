@@ -9,6 +9,7 @@
       "student_book_id": null,
       "type": "sb",
       "work_book_id": "ad2e0373-2805-4c72-bfd0-1ad5bd2cb0f2",
+      "level_id": "30802206-c56e-44fe-b64d-79dffab08cf2",
       "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/American%20Family%20and%20Friends%206%20SB%202nd%20Edition.png"
     },
     {
@@ -20,6 +21,7 @@
       "student_book_id": "7d3bf15c-b125-4340-9777-889300780f2b",
       "type": "sb",
       "work_book_id": "7d3bf15c-b125-4340-9777-889300780f2b",
+      "level_id": "eaa757e4-be62-4abd-bbeb-4d9ca3b16adf",
       "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/American%20Family%20and%20Friends%204%20SB%202nd%20Edition.png"
     },
     {
@@ -31,6 +33,7 @@
       "student_book_id": null,
       "type": "sb",
       "work_book_id": "ffd43202-1f64-4ed2-b3ff-98b8e3ac9b8b",
+      "level_id": "78b2b229-3360-4d9e-8445-36ead978fa42",
       "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/American%20Family%20and%20Friends%205%20SB%202nd%20Edition.png"
     },
     {
@@ -42,6 +45,7 @@
       "student_book_id": "7a2467a2-79d0-4547-8ae2-eb0a71f8c633",
       "type": "wb",
       "work_book_id": null,
+      "level_id": "eaa757e4-be62-4abd-bbeb-4d9ca3b16adf",
       "link_image": ""
     },
     {
@@ -53,6 +57,7 @@
       "student_book_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
       "type": "sb",
       "work_book_id": "7ffe0208-b6c8-4fec-ba2c-26211a764cb2",
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
       "link_image": "https://macpwgocrmlkwjjhhgzc.supabase.co/storage/v1/object/public/store2/image/Screenshot%202025-11-28%20101724.png"
     },
     {
@@ -64,6 +69,7 @@
       "student_book_id": "7e2e7dd6-6553-4b6b-a56d-f7ff46f518ed",
       "type": "wb",
       "work_book_id": null,
+      "level_id": "88860a52-688a-4b28-bd50-a71d9889b51c",
       "link_image": ""
     },
     {
@@ -75,6 +81,7 @@
       "student_book_id": "0cdc4c66-4c7e-437c-9900-a2fdcdc4ceff",
       "type": "wb",
       "work_book_id": null,
+      "level_id": "30802206-c56e-44fe-b64d-79dffab08cf2",
       "link_image": ""
     },
     {
@@ -86,6 +93,7 @@
       "student_book_id": "7ad11ac8-a819-48a6-9fba-c6fb3f8ba8dc",
       "type": "wb",
       "work_book_id": null,
+      "level_id": "78b2b229-3360-4d9e-8445-36ead978fa42",
       "link_image": ""
     }
   ],

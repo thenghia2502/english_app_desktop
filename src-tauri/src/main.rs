@@ -65,6 +65,8 @@ struct Curriculum {
     created_at: String,
     updated_at: String,
     link_image: String,
+    level: Option<LevelInfo>,
+    unit_count: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -93,7 +95,7 @@ struct CurriculumFull {
     link_image: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 struct LevelInfo {
     id: String,
     name: String,
@@ -174,6 +176,8 @@ struct SeedCurriculum {
     description: Option<String>,
     created_at: String,
     updated_at: String,
+    #[serde(default)]
+    level_id: Option<String>,
     #[serde(default)]
     student_book_id: Option<String>,
     #[serde(rename = "type", default)]
@@ -346,6 +350,7 @@ CREATE TABLE IF NOT EXISTS curriculums (
   description TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
+    level_id TEXT NOT NULL DEFAULT '',
   student_book_id TEXT,
   type TEXT NOT NULL DEFAULT '',
   work_book_id TEXT,
@@ -477,6 +482,12 @@ CREATE TABLE IF NOT EXISTS notes (
         conn
             .execute("ALTER TABLE curriculums ADD COLUMN link_image TEXT NOT NULL DEFAULT ''", [])
             .map_err(|e| format!("failed to migrate curriculums.link_image: {e}"))?;
+    }
+
+    if !table_has_column(conn, "curriculums", "level_id")? {
+        conn
+            .execute("ALTER TABLE curriculums ADD COLUMN level_id TEXT NOT NULL DEFAULT ''", [])
+            .map_err(|e| format!("failed to migrate curriculums.level_id: {e}"))?;
     }
 
     if !table_has_column(conn, "books", "level_id")? {
@@ -646,11 +657,75 @@ CREATE TABLE IF NOT EXISTS notes (
     Ok(())
 }
 
+fn database_has_seed_data(conn: &Connection) -> Result<bool, String> {
+    for table in [
+        "curriculums",
+        "levels_code",
+        "levels",
+        "books",
+        "units",
+        "lessons",
+        "words",
+        "curriculum_units",
+        "words_units",
+        "lessons_units",
+        "lessons_words",
+        "notes",
+    ] {
+        let sql = format!("SELECT EXISTS(SELECT 1 FROM {table} LIMIT 1)");
+        let has_rows: i64 = conn
+            .query_row(&sql, [], |row| row.get(0))
+            .map_err(|e| format!("failed to inspect {table}: {e}"))?;
+
+        if has_rows != 0 {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+fn backfill_curriculum_level_ids(conn: &mut Connection, seed: &SeedData) -> Result<(), String> {
+    if !table_has_column(conn, "curriculums", "level_id")? {
+        return Ok(());
+    }
+
+    let tx = conn
+        .transaction()
+        .map_err(|e| format!("failed to start curriculum level backfill: {e}"))?;
+
+    for item in &seed.curriculums {
+        let Some(level_id) = item.level_id.clone() else {
+            continue;
+        };
+
+        if level_id.is_empty() {
+            continue;
+        }
+
+        tx
+            .execute(
+                "UPDATE curriculums SET level_id = ?2 WHERE id = ?1 AND (level_id IS NULL OR level_id = '')",
+                params![item.id, level_id]
+            )
+            .map_err(|e| format!("failed to backfill curriculums.level_id: {e}"))?;
+    }
+
+    tx.commit().map_err(|e| format!("failed to commit curriculum level backfill: {e}"))?;
+
+    Ok(())
+}
+
 fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
     let raw_seed = include_str!("../../data/seed.json");
     let seed: SeedData = serde_json
         ::from_str(raw_seed)
         .map_err(|e| format!("invalid seed json: {e}"))?;
+
+    if database_has_seed_data(conn)? {
+        backfill_curriculum_level_ids(conn, &seed)?;
+        return Ok(());
+    }
 
     let expected_curriculums = seed.curriculums.len();
     let expected_books = seed.books.len();
@@ -713,6 +788,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
     let seed_level_ids: HashSet<String> = seed.books
         .iter()
         .map(|item| item.level_id.clone())
+        .chain(seed.curriculums.iter().filter_map(|item| item.level_id.clone()))
         .chain(seed.units.iter().map(|item| item.level_id.clone()))
         .filter(|level_id| !level_id.is_empty())
         .collect();
@@ -724,17 +800,49 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
         .collect::<Result<HashSet<_>, _>>()
         .map_err(|e| format!("failed to read existing curriculums: {e}"))?;
 
-    let existing_level_ids: HashSet<String> = if table_has_column(conn, "books", "level_id")? {
-        conn
-            .prepare("SELECT DISTINCT level_id FROM books WHERE level_id <> '' ORDER BY level_id")
-            .map_err(|e| format!("failed to inspect existing levels: {e}"))?
-            .query_map([], |row| row.get::<_, String>(0))
-            .map_err(|e| format!("failed to query existing levels: {e}"))?
-            .collect::<Result<HashSet<_>, _>>()
-            .map_err(|e| format!("failed to read existing levels: {e}"))?
-    } else {
-        HashSet::new()
-    };
+    let mut existing_level_ids: HashSet<String> = HashSet::new();
+
+    if table_has_column(conn, "books", "level_id")? {
+        existing_level_ids.extend(
+            conn
+                .prepare(
+                    "SELECT DISTINCT level_id FROM books WHERE level_id <> '' ORDER BY level_id"
+                )
+                .map_err(|e| format!("failed to inspect existing levels: {e}"))?
+                .query_map([], |row| row.get::<_, String>(0))
+                .map_err(|e| format!("failed to query existing levels: {e}"))?
+                .collect::<Result<HashSet<_>, _>>()
+                .map_err(|e| format!("failed to read existing levels: {e}"))?
+        );
+    }
+
+    if table_has_column(conn, "curriculums", "level_id")? {
+        existing_level_ids.extend(
+            conn
+                .prepare(
+                    "SELECT DISTINCT level_id FROM curriculums WHERE level_id <> '' ORDER BY level_id"
+                )
+                .map_err(|e| format!("failed to inspect existing curriculum levels: {e}"))?
+                .query_map([], |row| row.get::<_, String>(0))
+                .map_err(|e| format!("failed to query existing curriculum levels: {e}"))?
+                .collect::<Result<HashSet<_>, _>>()
+                .map_err(|e| format!("failed to read existing curriculum levels: {e}"))?
+        );
+    }
+
+    if table_has_column(conn, "units", "level_id")? {
+        existing_level_ids.extend(
+            conn
+                .prepare(
+                    "SELECT DISTINCT level_id FROM units WHERE level_id <> '' ORDER BY level_id"
+                )
+                .map_err(|e| format!("failed to inspect existing unit levels: {e}"))?
+                .query_map([], |row| row.get::<_, String>(0))
+                .map_err(|e| format!("failed to query existing unit levels: {e}"))?
+                .collect::<Result<HashSet<_>, _>>()
+                .map_err(|e| format!("failed to read existing unit levels: {e}"))?
+        );
+    }
 
     let existing_book_ids: HashSet<String> = conn
         .prepare("SELECT id FROM books ORDER BY id")
@@ -894,12 +1002,13 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
     for item in seed.curriculums {
         tx
             .execute(
-                "INSERT INTO curriculums (id, name, description, created_at, updated_at, student_book_id, type, work_book_id, link_image) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+                "INSERT INTO curriculums (id, name, description, created_at, updated_at, level_id, student_book_id, type, work_book_id, link_image) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
                  ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name,
                     description = excluded.description,
                     created_at = excluded.created_at,
                     updated_at = excluded.updated_at,
+                    level_id = excluded.level_id,
                     student_book_id = excluded.student_book_id,
                     type = excluded.type,
                     work_book_id = excluded.work_book_id,
@@ -910,6 +1019,7 @@ fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
                     item.description.unwrap_or_default(),
                     item.created_at,
                     item.updated_at,
+                    item.level_id.unwrap_or_default(),
                     item.student_book_id.unwrap_or_default(),
                     item.type_.unwrap_or_default(),
                     item.work_book_id.unwrap_or_default(),
@@ -1242,16 +1352,16 @@ fn get_curriculums(
     let total_pages = ((total as f64) / (limit as f64)).ceil() as i64;
 
     let mut query =
-        "SELECT id, name, description, created_at, updated_at, link_image FROM curriculums".to_string();
+        "SELECT c.id, c.name, c.description, c.created_at, c.updated_at, c.link_image, l.id, l.name, lc.code, (SELECT COUNT(*) FROM curriculum_units cu WHERE cu.curriculum_id = c.id) AS unit_count FROM curriculums c LEFT JOIN levels l ON l.id = c.level_id LEFT JOIN levels_code lc ON lc.id = l.code".to_string();
     let mut param_values: Vec<rusqlite::types::Value> = Vec::new();
 
     if let Some(search_pattern) = search_pattern {
-        query.push_str(" WHERE type = 'sb' AND (name LIKE ? OR description LIKE ?)");
+        query.push_str(" WHERE c.type = 'sb' AND (c.name LIKE ? OR c.description LIKE ?)");
         param_values.push(rusqlite::types::Value::Text(search_pattern.clone()));
         param_values.push(rusqlite::types::Value::Text(search_pattern));
     }
 
-    query.push_str(" ORDER BY name");
+    query.push_str(" ORDER BY c.name");
 
     query.push_str(" LIMIT ?");
     param_values.push(rusqlite::types::Value::Integer(limit));
@@ -1269,6 +1379,22 @@ fn get_curriculums(
                 created_at: row.get(3)?,
                 updated_at: row.get(4)?,
                 link_image: row.get(5)?,
+                level: {
+                    let level_id: Option<String> = row.get(6)?;
+                    let level_name: Option<String> = row.get(7)?;
+                    let level_code: Option<String> = row.get(8)?;
+
+                    match (level_id, level_name, level_code) {
+                        (Some(level_id), Some(level_name), Some(level_code)) =>
+                            Some(LevelInfo {
+                                id: level_id,
+                                name: level_name,
+                                code_name: level_code,
+                            }),
+                        _ => None,
+                    }
+                },
+                unit_count: row.get(9)?,
             })
         })
         .map_err(|e| format!("query error: {e}"))?;
@@ -1326,7 +1452,6 @@ struct CurriculumDetail {
     created_at: String,
     updated_at: String,
     link_image: String,
-
     units: Vec<UnitResponse>,
     levels: Vec<LevelResponse>, // 👈 thêm
 }

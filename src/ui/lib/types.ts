@@ -153,6 +153,16 @@ export interface Curriculum {
     created_at?: string
     updated_at?: string
     link_image?: string
+    level?: {
+        level_id?: string
+        level_name?: string
+        level_code?: string
+        level_description?: string
+        id?: string
+        name?: string
+        code?: string
+        code_name?: string
+    }
     levels: {
         level_id: string
         level_name: string
@@ -178,6 +188,7 @@ export interface Curriculum {
             word_popularity?: number
         }[]
     }[]
+    unit_count?: number
 }
 
 export interface LessonList {

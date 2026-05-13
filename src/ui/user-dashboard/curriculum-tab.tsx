@@ -83,10 +83,10 @@ export default function CurriculumTab({
                   </button>
                 </div>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded">Intermediate</span>
+                  <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded">{curriculum.level?.name || "Level not specified"}({curriculum.level?.code_name || "Code not specified"})</span>
                   <div className="flex items-center gap-1 text-slate-500 dark:text-slate-500 text-sm">
                     <span className="material-symbols-outlined text-base"><BookOpenText /></span>
-                    <span>{curriculum.units.length} Lessons</span>
+                    <span>{curriculum.unit_count} Lessons</span>
                   </div>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-600 line-clamp-2 mb-4">
