@@ -646,7 +646,39 @@ CREATE TABLE IF NOT EXISTS notes (
     Ok(())
 }
 
+fn database_has_seed_data(conn: &Connection) -> Result<bool, String> {
+    for table in [
+        "curriculums",
+        "levels_code",
+        "levels",
+        "books",
+        "units",
+        "lessons",
+        "words",
+        "curriculum_units",
+        "words_units",
+        "lessons_units",
+        "lessons_words",
+        "notes",
+    ] {
+        let sql = format!("SELECT EXISTS(SELECT 1 FROM {table} LIMIT 1)");
+        let has_rows: i64 = conn
+            .query_row(&sql, [], |row| row.get(0))
+            .map_err(|e| format!("failed to inspect {table}: {e}"))?;
+
+        if has_rows != 0 {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
 fn maybe_seed(conn: &mut Connection) -> Result<(), String> {
+    if database_has_seed_data(conn)? {
+        return Ok(());
+    }
+
     let raw_seed = include_str!("../../data/seed.json");
     let seed: SeedData = serde_json
         ::from_str(raw_seed)
