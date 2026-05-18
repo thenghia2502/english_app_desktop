@@ -75,7 +75,7 @@ export default function Modal({
     }, [form, curriculums, selectedCurriculum]);
 
     // Pagination logic
-    const itemsPerPage = 10;
+    const itemsPerPage = 24;
     const totalItems = baiList.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -203,7 +203,7 @@ export default function Modal({
                     {/* Form Content - Only show when data is loaded */}
                     {!isLoading && !error && (
                         <FormProvider {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex flex-col h-full">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col h-full">
                                 {/* Submitting Overlay */}
                                 {isSubmitting && (
                                     <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-lg">
@@ -249,9 +249,8 @@ export default function Modal({
                                     onItemChange={handleItemChange}
                                 />
 
-                                <div className="flex-none pt-4 border-t border-gray-200">
-                                    <SubmitButton isSubmitting={isSubmitting} isEditMode={isEditMode} />
-                                </div>
+                                <SubmitButton isSubmitting={isSubmitting} isEditMode={isEditMode} />
+
                             </form>
                         </FormProvider>
                     )}
