@@ -19,6 +19,10 @@ export default function Dashboard({
   const [activeTab, setActiveTab] = useState<DashboardTab>("lessons")
 
   const handleTabChange = (nextTab: string) => {
+    if (nextTab === 'profile') {
+      alert(`Chức năng đang phát triển!`)
+      return
+    }
     if (DASHBOARD_TABS.includes(nextTab as DashboardTab)) {
       setActiveTab(nextTab as DashboardTab)
     }

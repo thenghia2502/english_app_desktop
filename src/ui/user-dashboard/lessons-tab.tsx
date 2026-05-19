@@ -148,9 +148,9 @@ export default function LessonsTab() {
                                             ))}
                                         </div> */}
                                     </div>
-                                    {/* <span className="text-xs bg-prima mt-6ry/10 text-primary px-2 py-1 rounded font-semibold">
+                                    <span className="text-xs bg-prima mt-6ry/10 text-primary px-2 py-1 rounded font-semibold">
                                         {lesson.category}
-                                    </span> */}
+                                    </span>
                                 </div>
                                 <CardDescription>description:{lesson.description}</CardDescription>
                             </CardHeader>
