@@ -292,6 +292,7 @@ export interface LessonListItem {
     created_at: string;
     updated_at: string;
     description: string;
+    category?: string;
 }
 
 export interface LessonListMeta {

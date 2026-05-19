@@ -2801,6 +2801,7 @@ pub struct LessonListItem {
     pub updated_at: Option<String>,
     pub description: Option<String>,
     pub words_count: i64,
+    pub category: Option<String>,
 }
 
 #[derive(serde::Serialize)]
@@ -2888,7 +2889,8 @@ fn get_lesson_list(
             created_at,
             updated_at,
             description,
-            (SELECT COUNT(*) FROM lessons_words WHERE lessons_words.lesson_id = lessons.id) AS words_count
+            (SELECT COUNT(*) FROM lessons_words WHERE lessons_words.lesson_id = lessons.id) AS words_count,
+            category
         FROM lessons
         WHERE deleted_at IS NULL
           AND name LIKE ?1
@@ -2913,6 +2915,7 @@ fn get_lesson_list(
                 updated_at: row.get(6)?,
                 description: row.get(7)?,
                 words_count: row.get(8)?,
+                category: row.get(9)?,
             })
         })
         .map_err(|e| e.to_string())?;
