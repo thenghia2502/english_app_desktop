@@ -8,7 +8,7 @@ export interface SubmitButtonProps {
 }
 export default function SubmitButton({ isSubmitting, isEditMode }: SubmitButtonProps) {
   return (
-    <div className="flex-none flex justify-end pt-4 border-t bg-white">
+    <div className="flex-none flex justify-end bg-white">
       <Button
         type="submit"
         disabled={isSubmitting}

@@ -288,6 +288,7 @@ export interface LessonListItem {
     order: number;
     duration: number;
     progress: number;
+    words_count?: number;
     created_at: string;
     updated_at: string;
     description: string;

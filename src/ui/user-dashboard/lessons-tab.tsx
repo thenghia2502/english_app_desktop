@@ -173,6 +173,7 @@ export default function LessonsTab() {
                                             ) : null
                                         })()}
                                     </div> */}
+                                    Số từ: <span className="font-medium text-foreground">{lesson.words_count}</span>
                                     <Clock className="w-4 h-4" />
                                     <span>{msToHMSLabel(lesson.duration)}</span>
                                 </div>
