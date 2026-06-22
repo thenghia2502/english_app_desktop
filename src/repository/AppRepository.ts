@@ -174,7 +174,12 @@ export class AppRepository {
   }
 
   resolveAudio(word: string, accent: "uk" | "us"): Promise<string | null> {
-    return invoke("resolve_audio", { word, accent });
+    console.debug('[AppRepository] invoke resolve_audio start', { word, accent })
+    const start = Date.now()
+    return invoke("resolve_audio", { word, accent }).then((res) => {
+      console.debug('[AppRepository] invoke resolve_audio end', { word, accent, took: Date.now() - start, hasResult: Boolean(res) })
+      return res as string | null
+    })
   }
 
   getWordsByUnitId(unitIds: string[]): Promise<ApiUnitData[]> {

@@ -218,6 +218,8 @@ export function useAudioManager({
 
             setAudioError(false)
 
+            // No Web Speech API fast path: use resolved audio URLs only.
+
             try {
                 // Use cached audioUrl if it matches current dialect
                 if (wordToPlay.audioUrl && (wordToPlay as any).audioDialect === dialect) {

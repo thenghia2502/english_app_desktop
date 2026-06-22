@@ -18,7 +18,7 @@ import VocabTable from "@/components/vocab-trainer/VocabTable"
 import { useAudioManager } from "@/components/vocab-trainer/useAudioManager"
 
 // Audio data imports
-import { useGetUrlAudio } from "@/hooks/use-audios"
+import { useGetUrlAudio, prefetchAudioUrls } from "@/hooks/use-audios"
 
 
 const mapLessonWordToTrainerWord = (word: any): LessonWord => ({
@@ -170,6 +170,17 @@ export default function VocabTrainer() {
 
                 setVocabularyData(transformedData)
                 setCurrentIndex(0)
+                // Prefetch local audio for faster first play using resolveAudio
+                try {
+                    const words = transformedData.map(w => w.word)
+                    // Prefetch both accents to avoid delay when user switches dialect
+                    void Promise.all([
+                        prefetchAudioUrls(words, 'us'),
+                        prefetchAudioUrls(words, 'uk')
+                    ])
+                } catch (e) {
+                    console.debug('prefetchAudioUrls error', e)
+                }
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Khong the tai du lieu tu vung'
                 setTransformError(errorMessage)
